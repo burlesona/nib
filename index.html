@@ -5,14 +5,26 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <p id="testblock" class="block">
-      To start experimenting, create a new editor
-      instance and pass this node to its constructor.
-    </p>
+    <div id="toolbar">
+      <a href="#" data-command="bold">Bold</a>
+      <a href="#" data-command="italic">Italic</a>
+      <a href="#" data-command="underline">Underline</a>
+    </div>
+
+    <div id="content">
+      <p id="testblock" class="block">
+        To start experimenting, create a new editor
+        instance and pass this node to its constructor.
+      </p>
+    </div>
+
     <script src="/compiled/editor.js"></script>
     <script>
-      var el = document.getElementById('testblock');
-      var ed = new Editor(el);
+      var el, ed;
+      el = document.getElementById('testblock');
+      ed = new Editor(el);
+      ed.activate();
     </script>
+    <script src="/compiled/toolbar.js"></script>
   </body>
 </html>

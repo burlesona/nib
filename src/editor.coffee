@@ -15,4 +15,8 @@ class root.Editor
     @node.className = @originalClass
     @node.setAttribute 'contenteditable', false
 
-  revert: -> @node.innerHTML = @originalContent
+  revert: ->
+    @node.innerHTML = @originalContent
+
+  exec: (command) ->
+    document.execCommand command, false, window.getSelection()
