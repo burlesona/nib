@@ -5,8 +5,14 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <p class="block">Hello World</p>
-    <p class="block editing">Editing this!</p>
+    <p id="testblock" class="block">
+      To start experimenting, create a new editor
+      instance and pass this node to its constructor.
+    </p>
     <script src="/compiled/editor.js"></script>
+    <script>
+      var el = document.getElementById('testblock');
+      var ed = new Editor(el);
+    </script>
   </body>
 </html>
