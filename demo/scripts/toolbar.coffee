@@ -8,5 +8,5 @@ sendCommand = (event) ->
   ed.exec event.target.dataset.command
   false
 
-buttons = document.getElementById('toolbar').childNodes;
+buttons = document.getElementById('toolbar').childNodes
 button.addEventListener('click', sendCommand) for button in buttons
