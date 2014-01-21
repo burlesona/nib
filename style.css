@@ -1,0 +1,10 @@
+body {
+  background: #F2F2F2;
+  margin: 0; padding: 20px;
+  line-height: 20px; font-size: 15px; font-family: "Helvetica Neue", sans-serif;
+}
+
+p { margin: 0; }
+
+.block { padding: 5px 10px; }
+.block.editing { background: #FFF; }
