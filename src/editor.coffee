@@ -31,5 +31,5 @@ class root.Editor extends Events
     window.getSelection()
 
   initEvents: ->
-    $(@node).on 'keydown', (event) =>
+    @node.addEventListener 'keydown', (event) =>
       @trigger('keydown', event)
