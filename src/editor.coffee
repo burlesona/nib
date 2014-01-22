@@ -1,15 +1,22 @@
 # Global Scope
 root = exports ? this
 
+
 class root.Editor
-  constructor: (node) ->
-    @node = node
-    @originalClass = node.className
-    @originalContent = node.innerHTML
+  plugins: []
+  events: new Events()
+
+  constructor: (opts) ->
+    @opts = opts || {}
+    @node = opts.node
+    @originalClass = @node.className
+    @originalContent = @node.innerHTML
 
   activate: ->
     @node.className += ' editing'
     @node.setAttribute 'contenteditable', true
+    @plugins = [new Plug(@) for Plug in @opts.plugins]
+    @initEvents()
 
   deactivate: ->
     @node.className = @originalClass
@@ -19,4 +26,12 @@ class root.Editor
     @node.innerHTML = @originalContent
 
   exec: (command) ->
-    document.execCommand command, false, window.getSelection()
+    document.execCommand(command, false, @getSelection())
+
+  getSelection: ->
+    window.getSelection()
+
+  initEvents: ->
+    events = @events
+    $(@node).on 'keydown', (event) ->
+      events.trigger('keydown', event)

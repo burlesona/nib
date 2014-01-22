@@ -18,12 +18,18 @@
       </p>
     </div>
 
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="/compiled/events.js"></script>
     <script src="/compiled/editor.js"></script>
+    <script src="/compiled/plugins/text.js"></script>
     <script src="/compiled/toolbar.js"></script>
     <script>
       var el, ed;
       el = document.getElementById('testblock');
-      ed = new Editor(el);
+      ed = new Editor({
+        node: el,
+        plugins: [BoldText, ItalicText, Underline]
+      });
       ed.activate();
     </script>
   </body>
