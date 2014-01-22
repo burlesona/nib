@@ -1,25 +1,27 @@
 # Global Scope
 root = exports ? this
 
-class root.BoldText
+class root.MetaKeyAction
+  key: null
+  action: ''
   constructor: (editor) ->
-    editor.events.on 'keydown', (event) ->
-      if event.ctrlKey and event.which == 66
+    @editor = editor
+    @editor.on 'keydown', (event) =>
+      if event.metaKey and event.which == @key
         event.preventDefault()
-        editor.exec 'bold'
+        @editor.exec @action
 
 
-class root.ItalicText
-  constructor: (editor) ->
-    editor.events.on 'keydown', (event) ->
-      if event.ctrlKey and event.which == 73
-        event.preventDefault()
-        editor.exec 'italic'
+class root.BoldText extends MetaKeyAction
+  key: 66
+  action: 'bold'
 
 
-class root.Underline
-  constructor: (editor) ->
-    editor.events.on 'keydown', (event) ->
-      if event.ctrlKey and event.which == 85
-        event.preventDefault()
-        editor.exec 'underline'
+class root.ItalicText extends MetaKeyAction
+  key: 73
+  action: 'italic'
+
+
+class root.Underline extends MetaKeyAction
+  key: 85
+  action: 'underline'

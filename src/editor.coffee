@@ -2,9 +2,8 @@
 root = exports ? this
 
 
-class root.Editor
+class root.Editor extends Events
   plugins: []
-  events: new Events()
 
   constructor: (opts) ->
     @opts = opts || {}
@@ -32,6 +31,5 @@ class root.Editor
     window.getSelection()
 
   initEvents: ->
-    events = @events
-    $(@node).on 'keydown', (event) ->
-      events.trigger('keydown', event)
+    @node.addEventListener 'keydown', (event) =>
+      @trigger('keydown', event)
