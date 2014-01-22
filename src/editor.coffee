@@ -35,9 +35,9 @@ class root.Editor extends Events
       @trigger('keydown', event)
 
   # Basic text manipulation
-  setBold: -> @exec('bold')
-  setItalic: -> @exec('italic')
-  setUnderline: -> @exec('underline')
-  setStrikeThrough: -> @exec('strikeThrough')
-  setSubscript: -> @exec('subscript')
-  setSuperscript: -> @exec('superscript')
+  toggleBold: -> @exec('bold')
+  toggleItalic: -> @exec('italic')
+  toggleUnderline: -> @exec('underline')
+  toggleStrikeThrough: -> @exec('strikeThrough')
+  toggleSubscript: -> @exec('subscript')
+  toggleSuperscript: -> @exec('superscript')

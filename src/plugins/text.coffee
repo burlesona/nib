@@ -15,14 +15,14 @@ class root.MetaKeyAction
 
 class root.BoldText extends MetaKeyAction
   key: 66  # key: b
-  method: 'setBold'
+  method: 'toggleBold'
 
 
 class root.ItalicText extends MetaKeyAction
   key: 73  # key: i
-  method: 'setItalic'
+  method: 'toggleItalic'
 
 
 class root.Underline extends MetaKeyAction
   key: 85  # key: u
-  method: 'setUnderline'
+  method: 'toggleUnderline'
