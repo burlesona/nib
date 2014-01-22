@@ -33,5 +33,5 @@ class root.Editor
 
   initEvents: ->
     events = @events
-    $(@node).on 'keydown', (ev) ->
-      events.trigger('keydown', ev)
+    $(@node).on 'keydown', (event) ->
+      events.trigger('keydown', event)
