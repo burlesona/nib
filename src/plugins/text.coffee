@@ -7,7 +7,7 @@ class root.MetaKeyAction
   constructor: (editor) ->
     @editor = editor
     @editor.on 'keydown', (event) =>
-      if event.metaKey and event.which == @key
+      if (event.ctrlKey or event.metaKey) and event.which == @key
         event.preventDefault()
         @editor.exec @action
 
