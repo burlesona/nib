@@ -33,3 +33,11 @@ class root.Editor extends Events
   initEvents: ->
     @node.addEventListener 'keydown', (event) =>
       @trigger('keydown', event)
+
+  # Basic text manipulation
+  toggleBold: -> @exec('bold')
+  toggleItalic: -> @exec('italic')
+  toggleUnderline: -> @exec('underline')
+  toggleStrikeThrough: -> @exec('strikeThrough')
+  toggleSubscript: -> @exec('subscript')
+  toggleSuperscript: -> @exec('superscript')
