@@ -5,7 +5,12 @@
 
 sendCommand = (event) ->
   event.preventDefault()
-  ed.exec event.target.dataset.command
+  command = event.target.dataset.command
+  event = event.target.dataset.event
+  if command?
+    ed.exec command
+  else if event?
+    ed.trigger event
   false
 
 buttons = document.getElementById('toolbar').childNodes

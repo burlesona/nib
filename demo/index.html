@@ -9,6 +9,8 @@
       <a href="#" data-command="bold">Bold</a>
       <a href="#" data-command="italic">Italic</a>
       <a href="#" data-command="underline">Underline</a>
+      <a href="#" data-event="unordered-list">Bullet List</a>
+      <a href="#" data-event="ordered-list">Number List</a>
     </div>
 
     <div id="content">
@@ -21,13 +23,14 @@
     <script src="/compiled/events.js"></script>
     <script src="/compiled/editor.js"></script>
     <script src="/compiled/plugins/text.js"></script>
+    <script src="/compiled/plugins/lists.js"></script>
     <script src="/compiled/toolbar.js"></script>
     <script>
       var el, ed;
       el = document.getElementById('testblock');
       ed = new Editor({
         node: el,
-        plugins: [BoldText, ItalicText, Underline]
+        plugins: [BoldText, ItalicText, Underline, UnorderedList, OrderedList]
       });
       ed.activate();
     </script>
