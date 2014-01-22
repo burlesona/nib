@@ -3,25 +3,26 @@ root = exports ? this
 
 class root.MetaKeyAction
   key: null
-  action: ''
+  method: ''
   constructor: (editor) ->
     @editor = editor
     @editor.on 'keydown', (event) =>
       if (event.ctrlKey or event.metaKey) and event.which == @key
         event.preventDefault()
-        @editor.exec @action
+        if @editor[@method]?
+          @editor[@method]()
 
 
 class root.BoldText extends MetaKeyAction
-  key: 66
-  action: 'bold'
+  key: 66  # key: b
+  method: 'setBold'
 
 
 class root.ItalicText extends MetaKeyAction
-  key: 73
-  action: 'italic'
+  key: 73  # key: i
+  method: 'setItalic'
 
 
 class root.Underline extends MetaKeyAction
-  key: 85
-  action: 'underline'
+  key: 85  # key: u
+  method: 'setUnderline'
