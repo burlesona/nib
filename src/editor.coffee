@@ -56,8 +56,11 @@ class root.Editor extends Events
   revert: ->
     @node.innerHTML = @originalContent
 
-  exec: (command) ->
-    document.execCommand(command, false, @getSelection())
+  exec: (command, args...) ->
+    if args.length > 0
+      document.execCommand(command, false, args...)
+    else
+      document.execCommand(command, false, @getSelection())
     @checkSelection()
 
   getSelection: ->

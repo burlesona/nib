@@ -6,10 +6,11 @@
 root = exports ? this
 
 el = document.getElementById 'testblock'
-ed = new Editor
+root.ed = new Editor
   node: el,
   plugins: ['BoldText', 'ItalicText', 'Underline',
-            'StrikeThrough', 'Subscript', 'Superscript']
+            'StrikeThrough', 'Subscript', 'Superscript',
+            'Link']
 
 ed.activate()
 root.initToolbar(ed)
