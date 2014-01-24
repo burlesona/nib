@@ -16,6 +16,6 @@ class root.Events
     this
 
   trigger: (name, args...) ->
-    for fn in @handlers[name]
+    for fn in (@handlers[name] || [])
       fn(args...)
     this

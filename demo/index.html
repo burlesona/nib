@@ -6,30 +6,24 @@
   </head>
   <body>
     <div id="toolbar">
-      <a href="#" data-command="bold">Bold</a>
-      <a href="#" data-command="italic">Italic</a>
-      <a href="#" data-command="underline">Underline</a>
+      <a href="#" id="bold" data-method="toggleBold">Bold</a>
+      <a href="#" id="italic" data-method="toggleItalic">Italic</a>
+      <a href="#" id="underline" data-method="toggleUnderline">Underline</a>
+      <a href="#" id="strikethrough" data-method="toggleStrikeThrough">StrikeThrough</a>
+      <a href="#" id="subscript" data-method="toggleSubscript">Subscript</a>
+      <a href="#" id="superscript" data-method="toggleSuperscript">Superscript</a>
     </div>
 
     <div id="content">
-      <p id="testblock" class="block">
-        To start experimenting, create a new editor
-        instance and pass this node to its constructor.
-      </p>
+      <p id="testblock" class="block">To start experimenting, create a new editor instance and pass this node to its constructor.</p>
     </div>
 
+    <script src="http://rangy.googlecode.com/svn/trunk/currentrelease/rangy-core.js"></script>
     <script src="/compiled/events.js"></script>
     <script src="/compiled/editor.js"></script>
+    <script src="/compiled/plugins/base.js"></script>
     <script src="/compiled/plugins/text.js"></script>
     <script src="/compiled/toolbar.js"></script>
-    <script>
-      var el, ed;
-      el = document.getElementById('testblock');
-      ed = new Editor({
-        node: el,
-        plugins: [BoldText, ItalicText, Underline]
-      });
-      ed.activate();
-    </script>
+    <script src="/compiled/application.js"></script>
   </body>
 </html>
