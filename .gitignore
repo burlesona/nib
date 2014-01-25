@@ -1,3 +1,5 @@
 demo/compiled/*
 compile.sh
 runserver.sh
+compiled
+node_modules/
