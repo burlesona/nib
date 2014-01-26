@@ -3,6 +3,7 @@ root = exports ? this
 
 
 class root.BoldText extends MetaKeyAction
+  @pluginName: 'bold'
   @editorMethods: toggleBold: -> @exec('bold')
   key: 66  # key: b
   method: 'toggleBold'
@@ -13,6 +14,7 @@ class root.BoldText extends MetaKeyAction
 
 
 class root.ItalicText extends MetaKeyAction
+  @pluginName: 'italic'
   @editorMethods: toggleItalic: -> @exec('italic')
   key: 73  # key: i
   method: 'toggleItalic'
@@ -23,6 +25,7 @@ class root.ItalicText extends MetaKeyAction
 
 
 class root.Underline extends MetaKeyAction
+  @pluginName: 'underline'
   @editorMethods: toggleUnderline: -> @exec('underline')
   key: 85  # key: u
   method: 'toggleUnderline'
@@ -33,6 +36,7 @@ class root.Underline extends MetaKeyAction
 
 
 class root.StrikeThrough extends BasePlugin
+  @pluginName: 'strikethrough'
   @editorMethods: toggleStrikeThrough: -> @exec('strikeThrough')
   onEventName: 'report:strikethrough:on'
   offEventName: 'report:strikethrough:off'
@@ -41,6 +45,7 @@ class root.StrikeThrough extends BasePlugin
 
 
 class root.Subscript extends BasePlugin
+  @pluginName: 'subscript'
   @editorMethods: toggleSubscript: -> @exec('subscript')
   onEventName: 'report:subscript:on'
   offEventName: 'report:subscript:off'
@@ -49,6 +54,7 @@ class root.Subscript extends BasePlugin
 
 
 class root.Superscript extends BasePlugin
+  @pluginName: 'superscript'
   @editorMethods: toggleSuperscript: -> @exec('superscript')
   onEventName: 'report:superscript:on'
   offEventName: 'report:superscript:off'

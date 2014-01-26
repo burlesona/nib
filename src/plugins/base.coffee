@@ -2,6 +2,7 @@
 root = exports ? this
 
 class root.BasePlugin
+  @pluginName: ''
   @editorMethods: {}
   onEventName: ''
   offEventName: ''

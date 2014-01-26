@@ -34,7 +34,7 @@ class root.Editor extends Events
 
   @register: (plugins...) ->
     for Plugin in plugins
-      @pluginsRegistry[Plugin.name] = Plugin
+      @pluginsRegistry[Plugin.pluginName] = Plugin
       Plugin.extendEditor(@)
 
   constructor: (opts) ->
