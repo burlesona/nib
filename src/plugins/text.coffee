@@ -21,7 +21,7 @@ class root.ItalicText extends MetaKeyAction
   onEventName: 'report:italic:on'
   offEventName: 'report:italic:off'
   validNode: (node) ->
-    node.nodeName == 'I'
+    node.nodeName == 'I' || node.nodeName == 'EM'
 
 
 class root.Underline extends MetaKeyAction
