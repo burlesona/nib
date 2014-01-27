@@ -46,11 +46,14 @@ class root.Editor extends Events
   activate: (callback) ->
     @node.setAttribute 'contenteditable', true
     @plugins = (new Editor.pluginsRegistry[name](@) for name in @opts.plugins)
-    @initEvents()
+    @initDOMEvents()
     callback this if callback?
 
   deactivate: (callback) ->
     @node.setAttribute 'contenteditable', false
+    plugin.deactivate() for plugin in @plugins
+    @deactivateDOMEvents()
+    @clear()
     callback this if callback?
 
   hasChanged: ->
@@ -66,19 +69,33 @@ class root.Editor extends Events
       document.execCommand(command, false, @getSelection())
     @checkSelection()
 
+  initDOMEvents: ->
+    @node.addEventListener 'keydown', @onKeydown.bind(@)
+    @node.addEventListener 'keyup', @onKeyup.bind(@)
+    @node.addEventListener 'mousedown', @onMousedown.bind(@)
+    @node.addEventListener 'mouseup', @onMouseup.bind(@)
+
+  deactivateDOMEvents: ->
+    @node.removeEventListener 'keydown', @onKeydown
+    @node.removeEventListener 'keyup', @onKeyup
+    @node.removeEventListener 'mousedown', @onMousedown
+    @node.removeEventListener 'mouseup', @onMouseup
+
+  onKeydown: (event) ->
+    @checkSelection()
+    @trigger('keydown', event)
+
+  onKeyup: (event) ->
+    @checkSelection()
+
+  onMousedown: (event) ->
+    @checkSelection()
+
+  onMouseup: (event) ->
+    @checkSelection()
+
   getSelection: ->
     rangy.getSelection()
-
-  initEvents: ->
-    @node.addEventListener 'keydown', (event) =>
-      @checkSelection()
-      @trigger('keydown', event)
-    @node.addEventListener 'keyup', (event) =>
-      @checkSelection()
-    @node.addEventListener 'mousedown', (event) =>
-      @checkSelection()
-    @node.addEventListener 'mouseup', (event) =>
-      @checkSelection()
 
   checkSelection: () ->
     selection = @getSelection()

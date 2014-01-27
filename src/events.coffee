@@ -19,3 +19,6 @@ class root.Events
     for fn in (@handlers[name] || [])
       fn(args...)
     this
+
+  clear: () ->
+    @handlers = {}
