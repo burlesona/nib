@@ -4,8 +4,6 @@ root = exports ? this
 class root.BasePlugin
   @pluginName: ''
   @editorMethods: {}
-  onEventName: ''
-  offEventName: ''
 
   @extendEditor: (Editor) ->
     for name, method of @editorMethods
@@ -24,7 +22,14 @@ class root.BasePlugin
 
   checkSelection: (selection, range, nodes, htmlContent) ->
     nodes = Utils.domNodes(nodes).filter @validNode
-    @editor.trigger(if nodes.length > 0 then @onEventName else @offEventName)
+    if nodes.length > 0
+      @editor.trigger("report:#{@pluginName}:on")
+    else
+      @editor.trigger("report:#{@pluginName}:off")
+
+
+  deactivate: () ->
+    null
 
 
 class root.MetaKeyAction extends BasePlugin
