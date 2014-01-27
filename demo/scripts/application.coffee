@@ -10,5 +10,7 @@ root.ed = new Editor
   node: el,
   plugins: ['bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'link']
 
-ed.activate()
+ed.activate (editor) ->
+  editor.node.className += ' editing'
+
 root.initToolbar(ed)
