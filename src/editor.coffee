@@ -53,6 +53,9 @@ class root.Editor extends Events
     @node.setAttribute 'contenteditable', false
     callback this if callback?
 
+  hasChanged: ->
+    @node.innerHTML != @originalContent
+
   revert: ->
     @node.innerHTML = @originalContent
 
