@@ -9,11 +9,16 @@ Nib is intended to be straightforward, to produce clean markup that is consisten
 Development
 -----------
 
-The project can be built using Gulp. To install gulp and dependencies:
+The project can be built using [Gulp][1]. First install Gulp globally:
 
 ```shell
 $ sudo npm -g install gulp
-$ npm install --save-dev gulp gulp-util gulp-concat gulp-uglify
+```
+
+Then, run npm install to load the local dependencies:
+
+```shell
+$ npm install
 ```
 
 To build the minified version:
@@ -23,3 +28,7 @@ $ gulp
 ```
 
 The minified output will be located in `dist/`.
+
+
+
+[1]: http://gulpjs.com/
