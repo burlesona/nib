@@ -8,7 +8,8 @@ root = exports ? this
 el = document.getElementById 'testblock'
 root.ed = new Editor
   node: el,
-  plugins: ['bold', 'italic', 'underline', 'strikethrough', 'subscript', 'superscript', 'link']
+  plugins: ['bold', 'italic', 'underline', 'strikethrough',
+            'subscript', 'superscript', 'link', 'outdent', 'indent']
 
 ed.activate (editor) ->
   editor.node.className += ' editing'

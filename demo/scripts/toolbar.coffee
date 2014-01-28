@@ -37,6 +37,9 @@ createLinkHandlers = (editor) ->
 root.initToolbar = (editor) ->
   setHandlers(editor, name) for name in [
     'bold', 'italic', 'underline', 'strikethrough',
-    'subscript', 'superscript'
+    'subscript', 'superscript', 'outdent', 'indent'
   ]
   createLinkHandlers(editor)
+
+
+
