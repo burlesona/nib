@@ -2,6 +2,7 @@ assert = chai.assert;
 
 makeNode = (type,html) ->
   el = document.createElement(type)
+  el.contentEditable = true
   el.innerHTML = html
   document.body.appendChild(el)
   el
@@ -29,7 +30,7 @@ describe "Editor", ->
     assert.ok Editor
 
   describe "activation", ->
-    it "should mark a node as contenteditable on activate", ->
+    it "should mark a node as contentEditable on activate", ->
       node = document.createElement 'p'
       node.innerText = 'Here is some sample text'
       ed = new Editor node: node
