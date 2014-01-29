@@ -1,0 +1,22 @@
+{
+  "framework": "mocha",
+  "launch_in_dev": ["Chrome"],
+  "before_tests": "coffee -bco test/compiled/src/ src/ && coffee -co test/compiled/ test/*.coffee",
+  "src_files": [
+    "test/lib/chai.js",
+    "test/lib/rangy-core.js",
+    "src/events.coffee",
+    "src/editor.coffee",
+    "src/plugins/*.coffee",
+    "test/*.coffee"
+  ],
+  "serve_files": [
+    "test/lib/chai.js",
+    "test/lib/rangy-core.js",
+    "test/compiled/src/events.js",
+    "test/compiled/src/editor.js",
+    "test/compiled/src/plugins/*.js",
+    "test/compiled/*.js"
+  ],
+  "on_exit": "rm -rf test/compiled"
+}
