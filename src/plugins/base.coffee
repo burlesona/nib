@@ -28,7 +28,6 @@ class root.BasePlugin
     else
       @editor.trigger("report:#{@constructor.pluginName}:off")
 
-
   deactivate: () ->
     null
 
