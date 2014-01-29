@@ -40,6 +40,3 @@ root.initToolbar = (editor) ->
     'subscript', 'superscript', 'outdent', 'indent'
   ]
   createLinkHandlers(editor)
-
-
-

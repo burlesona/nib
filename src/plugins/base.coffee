@@ -4,6 +4,7 @@ root = exports ? this
 class root.BasePlugin
   @pluginName: ''
   @editorMethods: {}
+  validNodes: []
 
   @extendEditor: (Editor) ->
     for name, method of @editorMethods
@@ -18,14 +19,14 @@ class root.BasePlugin
       @checkSelection(selection, range, nodes, htmlContent)
 
   validNode: (node) ->
-    false
+    node.nodeName.toLowerCase() in @validNodes
 
   checkSelection: (selection, range, nodes, htmlContent) ->
-    nodes = Utils.domNodes(nodes).filter @validNode
+    nodes = Utils.domNodes(nodes).filter @validNode.bind(@)
     if nodes.length > 0
-      @editor.trigger("report:#{@pluginName}:on")
+      @editor.trigger("report:#{@constructor.pluginName}:on")
     else
-      @editor.trigger("report:#{@pluginName}:off")
+      @editor.trigger("report:#{@constructor.pluginName}:off")
 
 
   deactivate: () ->
