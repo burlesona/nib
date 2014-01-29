@@ -91,10 +91,21 @@ class root.Editor extends Events
   wrap: (tagName) ->
     selection = @getSelection()
     range = selection.getRangeAt(0)
+
+    # create new wrapper node
     node = document.createElement tagName
     node.innerHTML = range.toHtml()
+
+    # insert in place of selection
     range.deleteContents()
     range.insertNode(node)
+
+    # selection is lost in the process, reselect it
+    newRange = rangy.createRange()
+    newRange.selectNodeContents(node)
+    selection.setSingleRange(newRange)
+    @checkSelection()
+
     @detach(selection, range)
 
   wrapped: (tagName) ->
