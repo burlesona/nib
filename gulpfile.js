@@ -17,7 +17,7 @@ var path = {
     root: './demo/compiled/',
     plugins: './demo/compiled/plugins/'
   },
-  dist: './demo/compiled/plugins/'
+  dist: './dist/'
 }
 
 // Setup the files for development
@@ -87,7 +87,7 @@ gulp.task('build',['compile'],function () {
     .pipe(uglify())
     .pipe(gulp.dest(path.dist));
   gulp.src(path.dist + 'editor-plugins.js')
-    .pipe(concat('editor-core.min.js'))
+    .pipe(concat('editor-plugins.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest(path.dist));
 });

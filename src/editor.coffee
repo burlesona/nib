@@ -45,13 +45,13 @@ class root.Editor extends Events
 
   activate: (callback) ->
     @node.setAttribute 'contenteditable', true
-    @plugins = (new Editor.pluginsRegistry[name](@) for name in @opts.plugins)
+    @plugins = (new Editor.pluginsRegistry[name](@) for name in @opts.plugins) if @opts.plugins?
     @initDOMEvents()
     callback this if callback?
 
   deactivate: (callback) ->
     @node.setAttribute 'contenteditable', false
-    plugin.deactivate() for plugin in @plugins
+    plugin.deactivate() for plugin in @plugins if @plugins
     @deactivateDOMEvents()
     @clear()
     callback this if callback?
