@@ -83,3 +83,7 @@ class root.Editor extends Events
         nodes = range.getNodes()
       nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, nodes)))
     @trigger('selection:change', selection, range, nodes, selection.toHtml())
+    @detach(selection, range)
+
+  detach: (args...) ->
+    rangyEl.detach() for rangyEl in args when rangyEl
