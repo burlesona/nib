@@ -44,5 +44,19 @@ class root.Superscript extends BasePlugin
   validNodes: ['sup']
 
 
+class root.BoldText2 extends BasePlugin
+  @pluginName: 'bold2'
+  @editorMethods:
+    toggleBold2: ->
+      if @wrapped('b')
+        @unwrap('b')
+      else if @wrapped('strong')
+        @unwrap('strong')
+      else
+        @wrap('b')
+  validNodes: ['b', 'strong']
+
+
 Editor.register(BoldText, ItalicText, Underline,
-                StrikeThrough, Subscript, Superscript)
+                StrikeThrough, Subscript, Superscript,
+                BoldText2)

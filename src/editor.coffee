@@ -87,3 +87,25 @@ class root.Editor extends Events
 
   detach: (args...) ->
     rangyEl.detach() for rangyEl in args when rangyEl
+
+  wrap: (tagName) ->
+    selection = @getSelection()
+    range = selection.getRangeAt(0)
+    node = document.createElement tagName
+    node.innerHTML = range.toHtml()
+    range.deleteContents()
+    range.insertNode(node)
+    @detach(selection, range)
+
+  wrapped: (tagName) ->
+    selection = @getSelection()
+    range = selection.getRangeAt(0)
+    nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, range.getNodes())))
+    @detach(selection, range)
+
+    for node in nodes when node.nodeType == 1
+      return true if node.tagName.toLowerCase() == tagName
+    false
+
+  unwrap: (tagName) ->
+    # TODO
