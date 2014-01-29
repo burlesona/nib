@@ -4,6 +4,7 @@
   "before_tests": "coffee -bco test/compiled/src/ src/ && coffee -co test/compiled/ test/*.coffee",
   "src_files": [
     "test/lib/chai.js",
+    "test/lib/rangy-core.js",
     "src/events.coffee",
     "src/editor.coffee",
     "src/plugins/*.coffee",
@@ -11,6 +12,7 @@
   ],
   "serve_files": [
     "test/lib/chai.js",
+    "test/lib/rangy-core.js",
     "test/compiled/src/events.js",
     "test/compiled/src/editor.js",
     "test/compiled/src/plugins/*.js",
