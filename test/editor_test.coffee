@@ -6,60 +6,81 @@ makeNode = (type,html) ->
   document.body.appendChild(el)
   el
 
-removeNode = (node) ->
-  node.parentNode.removeChild(node)
-
 testNode = (type,html,callback) ->
   node = makeNode type, html
   callback(node)
-  removeNode node
+  node.remove()
 
-makeSelection = (startNode,startOffset,endNode,endOffset) ->
-  r = rangy.createRange()
-  r.setStart(startNode,startOffset)
-  r.setEnd(endNode,endOffset)
-  s = window.getSelection()
-  s.removeAllRanges()
-  s.addRange(r.nativeRange)
-  s
+makeSelection = (startNode, startOffset, endNode, endOffset) ->
+  range = rangy.createRange()
+  range.setStart(startNode, startOffset)
+  range.setEnd(endNode, endOffset)
+  selection = window.getSelection()
+  selection.removeAllRanges()
+  selection.addRange(range.nativeRange)
+  range.detach()
 
-makeSelected = (html, invert = false) ->
-  root = makeNode('p', html)
+  selection
+
+makeBackwardSelection = (startNode, startOffset, endNode, endOffset) ->
+  range = rangy.createRange()
+  endRange = rangy.createRange()
+  selection = rangy.getSelection()
+
+  range.setStart(startNode, startOffset)
+  range.setEnd(startNode, startOffset)
+
+  endRange.setStart(endNode, endOffset)
+  endRange.setEnd(endNode, endOffset)
+
+  selection.addRange(range)
+  selection.addRange(endRange, true)
+
+  range.detach()
+  endRange.detach()
+
+  selection
+
+getSelectionParams = (element) ->
   selection = []
 
-  parseSelection = (element) ->
-    for node in element.childNodes
-      if node.nodeType == 3 # text
+  for node in element.childNodes
+    if node.nodeType == 3 # text
+      if (index = node.nodeValue.indexOf("|")) isnt -1
+        node.nodeValue = node.nodeValue.replace("|", "")
+        selection.push(node: node, index: index)
+
         if (index = node.nodeValue.indexOf("|")) isnt -1
           node.nodeValue = node.nodeValue.replace("|", "")
           selection.push(node: node, index: index)
+    else
+      selection = selection.concat(getSelectionParams(node))
 
-          if (index = node.nodeValue.indexOf("|")) isnt -1
-            node.nodeValue = node.nodeValue.replace("|", "")
-            selection.push(node: node, index: index)
-      else
-        parseSelection(node)
+  selection
 
-  parseSelection(root)
-  # FIXME: this wont work
-  selection.reverse() if invert
+testNodeWithSelection = (html, backwards, callback) ->
+  node = makeNode("p", html)
 
-  range = rangy.createRange()
-  range.setStart(selection[0].node, selection[0].index)
-  range.setEnd(selection[1].node, selection[1].index)
+  selection = getSelectionParams(node)
 
-  selection = rangy.getSelection()
-  selection.setSingleRange(range)
+  if backwards
+    makeBackwardSelection(selection[1].node, selection[1].index,
+                          selection[0].node, selection[0].index)
+  else
+    makeSelection(selection[0].node, selection[0].index,
+                  selection[1].node, selection[1].index)
 
-  root
+  callback(node)
 
-dumpSelection = () ->
+  node.remove()
+
+markSelection = () ->
   selection = getSelection()
   start = selection.baseOffset
   startText = selection.baseNode.nodeValue
 
   startText = endText = \
-    startText.slice(0, start) + '|' +
+    startText.slice(0, start) + "|" +
     startText.slice(start)
 
   if selection.baseNode is selection.extentNode
@@ -69,9 +90,8 @@ dumpSelection = () ->
     end = selection.extentOffset
     endText = selection.extentNode.nodeValue
 
-  endText = \
-    endText.slice(0, end) + '|' +
-    endText.slice(end)
+  endText = endText.slice(0, end) + "|" +
+            endText.slice(end)
 
   selection.extentNode.nodeValue = endText
   selection.removeAllRanges()
@@ -83,13 +103,7 @@ describe "Test Helpers", ->
       assert.equal p.nodeName, 'P'
       assert.equal p.innerText, 'Hello World!'
       assert document.body.lastChild == p
-      removeNode p
-
-  describe "removeNode", ->
-    it "should remove an element", ->
-      p = makeNode 'p', 'Hello World'
-      removeNode p
-      assert document.body.lastChild != p
+      p.remove()
 
   describe "testNode", ->
     it "should provide a temp node in a callback", ->
@@ -106,51 +120,112 @@ describe "Test Helpers", ->
         s = makeSelection p.firstChild, 0, p.firstChild, 7
         assert.equal s.toString(), 'Here is'
 
-  describe "makeSelected", ->
+  describe "getSelectionParams", ->
+    context "for h|ell|o", ->
+      it "remove the markers from node", ->
+        testNode "p", "h|ell|o", (node) ->
+          selection = getSelectionParams(node)
+
+          assert.equal(node.innerHTML, "hello")
+
+      it "returns the same element for start and end", ->
+        testNode "p", "h|ell|o", (node) ->
+          selection = getSelectionParams(node)
+
+          assert.equal(selection[0].node, node.firstChild)
+          assert.equal(selection[1].node, node.firstChild)
+
+      it "return the positions 1 and 4", ->
+        testNode "p", "h|ell|o", (node) ->
+          selection = getSelectionParams(node)
+
+          assert.equal(selection[0].index, 1)
+          assert.equal(selection[1].index, 4)
+
+    context "for <b>h|e</b>l|lo", ->
+      it "remove the markers from node", ->
+        testNode "p", "<b>h|e</b>l|lo", (node) ->
+          selection = getSelectionParams(node)
+
+          assert.equal(node.innerHTML, "<b>he</b>llo")
+
+      it "returns the first b child content for start", ->
+        testNode "p", "<b>h|e</b>l|lo", (node) ->
+          selection = getSelectionParams(node)
+
+          assert.equal(selection[0].node, node.querySelector("b").firstChild)
+
+      it "returns the last element for end", ->
+        testNode "p", "<b>h|e</b>l|lo", (node) ->
+          selection = getSelectionParams(node)
+
+          assert.equal(selection[1].node, node.lastChild)
+
+      it "return the position 1 for start", ->
+        testNode "p", "<b>h|e</b>l|lo", (node) ->
+          selection = getSelectionParams(node)
+
+          assert.equal(selection[0].index, 1)
+
+      it "return the position 1 for end", ->
+        testNode "p", "<b>h|e</b>l|lo", (node) ->
+          selection = getSelectionParams(node)
+
+          assert.equal(selection[1].index, 1)
+
+  describe "testNodeWithSelection", ->
+    context "backwards selection", ->
+      context "for h|ell|o", ->
+        it "selects ell", ->
+          testNodeWithSelection "h|ell|o", true, (node) ->
+            selection = rangy.getSelection()
+            assert.equal(selection.toHtml(), "ell")
+
+      context "for h|e<b>ll|o</b>", ->
+        it "selects e<b>ll</b>", ->
+          testNodeWithSelection "h|e<b>ll|o</b>", true, (node) ->
+            selection = rangy.getSelection()
+
+            assert.equal(selection.toHtml(), "e<b>ll</b>")
+
     context "for h|ell|o", ->
       it "creates a hello", ->
-        node = makeSelected("h|ell|o")
+        testNodeWithSelection "h|ell|o", false, (node) ->
 
-        assert.equal(node.innerHTML, "hello")
-        node.remove()
+          assert.equal(node.innerHTML, "hello")
 
       it "selects ell", ->
-        node = makeSelected("h|ell|o")
-        selection = rangy.getSelection()
+        testNodeWithSelection "h|ell|o", false, (node) ->
+          selection = rangy.getSelection()
 
-        assert.equal(selection.toHtml(), "ell")
-        node.remove()
+          assert.equal(selection.toHtml(), "ell")
 
      context "for h|e<b>ll|o</b>", ->
       it "creates a he<b>llo</b> node", ->
-        node = makeSelected("h|e<b>ll|o</b>")
+        testNodeWithSelection "h|e<b>ll|o</b>", false, (node) ->
 
-        assert.equal(node.innerHTML, "he<b>llo</b>")
-        node.remove()
+          assert.equal(node.innerHTML, "he<b>llo</b>")
 
       it "selects e<b>ll</b>", ->
-        node = makeSelected("h|e<b>ll|o</b>")
-        selection = rangy.getSelection()
+        testNodeWithSelection "h|e<b>ll|o</b>", false, (node) ->
+          selection = rangy.getSelection()
 
-        assert.equal(selection.toHtml(), "e<b>ll</b>")
-        node.remove()
+          assert.equal(selection.toHtml(), "e<b>ll</b>")
 
-  describe "dumpSelection", ->
+  describe "markSelection", ->
     it "adds marks to h|ell|o", ->
-      node = makeSelected("h|ell|o")
+      testNodeWithSelection "h|ell|o", false, (node) ->
 
-      dumpSelection()
+        markSelection()
 
-      assert.equal(node.innerHTML, "h|ell|o")
-      node.remove()
+        assert.equal(node.innerHTML, "h|ell|o")
 
     it "adds marks to h|e<b>ll|o</b>", ->
-      node = makeSelected("h|e<b>ll|o</b>")
+      testNodeWithSelection "h|e<b>ll|o</b>", false, (node) ->
 
-      dumpSelection()
+        markSelection()
 
-      assert.equal(node.innerHTML, "h|e<b>ll|o</b>")
-      node.remove()
+        assert.equal(node.innerHTML, "h|e<b>ll|o</b>")
 
 describe "Editor", ->
   it "should exist", ->
@@ -186,44 +261,40 @@ describe "Editor", ->
   describe "unwrap", ->
     context "for: <b>|hello|</b>", ->
       it "converts to '|hello|'", ->
-        p = makeSelected('<b>|hello|</b>')
-        ed = new Editor(node: p)
+        testNodeWithSelection "<b>|hello|</b>", false, (node) ->
+          ed = new Editor(node: node)
 
-        ed.unwrap('b')
-        assert.equal(p.textContent, 'hello')
-        dumpSelection()
-        assert.equal(p.innerHTML, '|hello|')
-        p.remove()
+          ed.unwrap("b")
+          assert.equal(node.textContent, "hello")
+          markSelection()
+          assert.equal(node.innerHTML, "|hello|")
 
     context "for: |h<b>ell</b>o|", ->
       it "converts to '|hello|'", ->
-        p = makeSelected('|h<b>ell</b>o|')
-        ed = new Editor(node: p)
+        testNodeWithSelection "|h<b>ell</b>o|", false, (node) ->
+          ed = new Editor(node: node)
 
-        ed.unwrap('b')
-        assert.equal(p.innerHTML, 'hello')
-        dumpSelection()
-        assert.equal(p.innerHTML, '|hello|')
-        p.remove()
+          ed.unwrap("b")
+          assert.equal(node.innerHTML, "hello")
+          markSelection()
+          assert.equal(node.innerHTML, "|hello|")
 
     context "for: |h<b>el|l</b>o", ->
       it "converts to '|hel|lo'", ->
-        p = makeSelected('|h<b>el|l</b>o')
-        ed = new Editor(node: p)
+        testNodeWithSelection "|h<b>el|l</b>o", false, (node) ->
+          ed = new Editor(node: node)
 
-        ed.unwrap('b')
-        assert.equal p.innerHTML, 'hello'
-        dumpSelection()
-        assert.equal(p.innerHTML, '|hel|lo')
-        p.remove()
+          ed.unwrap("b")
+          assert.equal(node.innerHTML, "hello")
+          markSelection()
+          assert.equal(node.innerHTML, "|hel|lo")
 
     context "for: h<b>|e</b><b>l|</b>lo", ->
       it "converts to 'h|el|lo'", ->
-        p = makeSelected('h<b>|e</b><b>l|</b>lo')
-        ed = new Editor(node: p)
+        testNodeWithSelection "h<b>|e</b><b>l|</b>lo", false, (node) ->
+          ed = new Editor(node: node)
 
-        ed.unwrap('b')
-        assert.equal p.innerHTML, 'hello'
-        dumpSelection()
-        assert.equal(p.innerHTML, 'h|el|lo')
-        p.remove()
+          ed.unwrap("b")
+          assert.equal(node.innerHTML, "hello")
+          markSelection()
+          assert.equal(node.innerHTML, "h|el|lo")
