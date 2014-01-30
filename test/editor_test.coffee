@@ -1,4 +1,4 @@
-assert = chai.assert;
+assert = chai.assert
 
 makeNode = (type,html) ->
   el = document.createElement(type)
@@ -100,12 +100,57 @@ describe "Test Helpers", ->
         assert.equal p.innerText, 'This is a test'
       assert document.body.lastChild != testP
 
-
   describe "makeSelection", ->
     it "should return a selection inside a node", ->
       testNode 'p', 'Here is a test', (p) ->
         s = makeSelection p.firstChild, 0, p.firstChild, 7
         assert.equal s.toString(), 'Here is'
+
+  describe "makeSelected", ->
+    context "for h|ell|o", ->
+      it "creates a hello", ->
+        node = makeSelected("h|ell|o")
+
+        assert.equal(node.innerHTML, "hello")
+        node.remove()
+
+      it "selects ell", ->
+        node = makeSelected("h|ell|o")
+        selection = rangy.getSelection()
+
+        assert.equal(selection.toHtml(), "ell")
+        node.remove()
+
+     context "for h|e<b>ll|o</b>", ->
+      it "creates a he<b>llo</b> node", ->
+        node = makeSelected("h|e<b>ll|o</b>")
+
+        assert.equal(node.innerHTML, "he<b>llo</b>")
+        node.remove()
+
+      it "selects e<b>ll</b>", ->
+        node = makeSelected("h|e<b>ll|o</b>")
+        selection = rangy.getSelection()
+
+        assert.equal(selection.toHtml(), "e<b>ll</b>")
+        node.remove()
+
+  describe "dumpSelection", ->
+    it "adds marks to h|ell|o", ->
+      node = makeSelected("h|ell|o")
+
+      dumpSelection()
+
+      assert.equal(node.innerHTML, "h|ell|o")
+      node.remove()
+
+    it "adds marks to h|e<b>ll|o</b>", ->
+      node = makeSelected("h|e<b>ll|o</b>")
+
+      dumpSelection()
+
+      assert.equal(node.innerHTML, "h|e<b>ll|o</b>")
+      node.remove()
 
 describe "Editor", ->
   it "should exist", ->
