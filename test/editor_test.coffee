@@ -23,7 +23,7 @@ makeSelection = (startNode,startOffset,endNode,endOffset) ->
   s.addRange(r.nativeRange)
   s
 
-makeSelected = (html, invert = false) ->
+makeSelected = (html, backwards = false) ->
   root = makeNode('p', html)
   selection = []
 
@@ -41,15 +41,29 @@ makeSelected = (html, invert = false) ->
         parseSelection(node)
 
   parseSelection(root)
-  # FIXME: this wont work
-  selection.reverse() if invert
 
   range = rangy.createRange()
-  range.setStart(selection[0].node, selection[0].index)
-  range.setEnd(selection[1].node, selection[1].index)
+  selectionObj = rangy.getSelection()
 
-  selection = rangy.getSelection()
-  selection.setSingleRange(range)
+  if backwards
+    range.setStart(selection[1].node, selection[1].index)
+    range.setEnd(selection[1].node, selection[1].index)
+
+    endRange = rangy.createRange()
+    endRange.setStart(selection[0].node, selection[0].index)
+    endRange.setEnd(selection[0].node, selection[0].index)
+
+    selectionObj.addRange(range)
+    selectionObj.addRange(endRange, true)
+
+    endRange.detach()
+  else
+    range.setStart(selection[0].node, selection[0].index)
+    range.setEnd(selection[1].node, selection[1].index)
+
+    selectionObj.setSingleRange(range)
+
+  range.detach()
 
   root
 
@@ -107,6 +121,22 @@ describe "Test Helpers", ->
         assert.equal s.toString(), 'Here is'
 
   describe "makeSelected", ->
+    context "backwards selection", ->
+      context "for h|ell|o", ->
+        it "selects ell", ->
+          node = makeSelected("h|ell|o", true)
+          selection = rangy.getSelection()
+          assert.equal(selection.toHtml(), "ell")
+          node.remove()
+
+      context "for h|e<b>ll|o</b>", ->
+        it "selects e<b>ll</b>", ->
+          node = makeSelected("h|e<b>ll|o</b>", true)
+          selection = rangy.getSelection()
+
+          assert.equal(selection.toHtml(), "e<b>ll</b>")
+          node.remove()
+
     context "for h|ell|o", ->
       it "creates a hello", ->
         node = makeSelected("h|ell|o")
