@@ -1,33 +1,6 @@
 # Global Scope
 root = exports ? this
 
-class root.Utils
-  @parentNodes: (stopNode, node) ->
-    if node instanceof Array
-      (@parentNodes(stopNode, n) for n in node)
-    else
-      parents = []
-      while node and node != stopNode
-        parents.push(node)
-        node = node.parentNode
-      parents
-
-  @flatten: (arr) ->
-    if arr.length is 0 then return []
-    arr.reduce (lhs, rhs) -> lhs.concat rhs
-
-  @uniqueNodes: (arr) ->
-    nodes = []
-    for node in arr
-      nodes.push(node) unless node._visited
-      node._visited = true
-    for node in nodes  # reset flag
-      node._visited = false
-    nodes
-
-  @domNodes: (nodes) ->
-    nodes.filter (n) -> n.nodeType == 1
-
 
 class root.Editor extends Events
   @pluginsRegistry: {}
@@ -110,3 +83,76 @@ class root.Editor extends Events
         nodes = range.getNodes()
       nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, nodes)))
     @trigger('selection:change', selection, range, nodes, selection.toHtml())
+    @detach(selection, range)
+
+  detach: (args...) ->
+    rangyEl.detach() for rangyEl in args when rangyEl
+
+  wrap: (tagName) ->
+    selection = @getSelection()
+    range = selection.getRangeAt(0)
+
+    # create new wrapper node
+    node = document.createElement tagName
+
+    if range.canSurroundContents()
+      range.surroundContents(node)
+
+    # selection is lost in the process, reselect it
+    newRange = rangy.createRange()
+    newRange.selectNodeContents(node)
+    selection.setSingleRange(newRange)
+    @checkSelection()
+
+    @detach(range)
+
+  lookForTags: (tagName, nodes) ->
+    tags = []
+    for node in nodes when node.nodeType == 1
+      if node.tagName.toLowerCase() == tagName
+        tags.push(node)
+    tags
+
+  lookForTag: (tagName, nodes) ->
+    for node in nodes when node.nodeType == 1
+      return node if node.tagName.toLowerCase() == tagName
+
+  wrapped: (tagName) ->
+    selection = @getSelection()
+    range = selection.getRangeAt(0)
+    nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, range.getNodes())))
+    @detach(selection, range)
+
+    !!@lookForTag(tagName, nodes)
+
+  unwrap: (tagName) ->
+    selection = @getSelection()
+    range = selection.getRangeAt(0)
+    nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, range.getNodes())))
+
+    tags = @lookForTags(tagName, nodes)
+
+    originalBase = selection.nativeSelection.baseNode
+    originalStart = selection.nativeSelection.baseOffset
+    originalExtent = selection.nativeSelection.extentNode
+    originalEnd = selection.nativeSelection.extentOffset
+
+    newRange = rangy.createRange()
+    newRange.setStart(originalBase, originalStart)
+    newRange.setEnd(originalExtent, originalEnd)
+
+    for node in tags
+      while (childNode = node.firstChild)
+        node.parentNode.insertBefore(childNode, node)
+
+        if childNode is originalBase
+          newRange.setStart(childNode, originalStart)
+        if childNode is originalExtent
+          newRange.setEnd(childNode, originalEnd)
+
+      node.remove()
+    selection.setSingleRange(newRange)
+
+    @checkSelection()
+
+    @detach(newRange, range)

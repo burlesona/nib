@@ -6,8 +6,8 @@ class root.Indent extends BasePlugin
   @pluginName: 'indent'
   @editorMethods:
     indentParagraph: -> @exec('indent')
-  validNode: (node) ->
-    node.nodeName == 'BLOCKQUOTE'
+  validNodes: ['blockquote']
+
 
 class root.Outdent extends BasePlugin
   @pluginName: 'outdent'
@@ -15,8 +15,7 @@ class root.Outdent extends BasePlugin
     outdentParagraph: ->
       quote = @node.querySelector 'blockquote'
       quote.outerHTML = quote.innerHTML if quote
-  validNode: (node) ->
-    node.nodeName == 'BLOCKQUOTE'
+  validNodes: ['blockquote']
 
 
 Editor.register(Indent, Outdent)

@@ -6,8 +6,7 @@ class root.Link extends BasePlugin
   @pluginName: 'link'
   @editorMethods:
     createLink: (url) -> @exec('createLink', url)
-  validNode: (node) ->
-    node.nodeName == 'A'
+  validNodes: ['a']
 
 
 Editor.register(Link)
