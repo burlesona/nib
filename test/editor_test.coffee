@@ -15,12 +15,12 @@ testNode = (type,html,callback) ->
   removeNode node
 
 makeSelection = (startNode,startOffset,endNode,endOffset) ->
-  r = document.createRange()
+  r = rangy.createRange()
   r.setStart(startNode,startOffset)
   r.setEnd(endNode,endOffset)
   s = window.getSelection()
   s.removeAllRanges()
-  s.addRange(r)
+  s.addRange(r.nativeRange)
   s
 
 describe "Test Helpers", ->
@@ -75,4 +75,14 @@ describe "Editor", ->
         ed.exec('bold',s)
         expected = "<b>Hello</b> World"
         assert.equal p.innerHTML, expected
+
+    it "should wrap an element in custom markup", ->
+      testNode 'p', 'Hello World', (p) ->
+        ed = new Editor node: p, plugins: ['bold2']
+        ed.activate()
+        s = makeSelection p.firstChild, 0, p.firstChild, 5
+        ed.toggleBold2()
+        expected = "<b>Hello</b> World"
+        assert.equal p.innerHTML, expected
+
 
