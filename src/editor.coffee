@@ -94,11 +94,9 @@ class root.Editor extends Events
 
     # create new wrapper node
     node = document.createElement tagName
-    node.innerHTML = range.toHtml()
 
-    # insert in place of selection
-    range.deleteContents()
-    range.insertNode(node)
+    if range.canSurroundContents()
+      range.surroundContents(node)
 
     # selection is lost in the process, reselect it
     newRange = rangy.createRange()
@@ -106,7 +104,18 @@ class root.Editor extends Events
     selection.setSingleRange(newRange)
     @checkSelection()
 
-    @detach(selection, range)
+    @detach(range)
+
+  lookForTags: (tagName, nodes) ->
+    tags = []
+    for node in nodes when node.nodeType == 1
+      if node.tagName.toLowerCase() == tagName
+        tags.push(node)
+    tags
+
+  lookForTag: (tagName, nodes) ->
+    for node in nodes when node.nodeType == 1
+      return node if node.tagName.toLowerCase() == tagName
 
   wrapped: (tagName) ->
     selection = @getSelection()
@@ -114,9 +123,36 @@ class root.Editor extends Events
     nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, range.getNodes())))
     @detach(selection, range)
 
-    for node in nodes when node.nodeType == 1
-      return true if node.tagName.toLowerCase() == tagName
-    false
+    !!@lookForTag(tagName, nodes)
 
   unwrap: (tagName) ->
-    # TODO
+    selection = @getSelection()
+    range = selection.getRangeAt(0)
+    nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, range.getNodes())))
+
+    tags = @lookForTags(tagName, nodes)
+
+    originalBase = selection.nativeSelection.baseNode
+    originalStart = selection.nativeSelection.baseOffset
+    originalExtent = selection.nativeSelection.extentNode
+    originalEnd = selection.nativeSelection.extentOffset
+
+    newRange = rangy.createRange()
+    newRange.setStart(originalBase, originalStart)
+    newRange.setEnd(originalExtent, originalEnd)
+
+    for node in tags
+      while (childNode = node.firstChild)
+        node.parentNode.insertBefore(childNode, node)
+
+        if childNode is originalBase
+          newRange.setStart(childNode, originalStart)
+        if childNode is originalExtent
+          newRange.setEnd(childNode, originalEnd)
+
+      node.remove()
+    selection.setSingleRange(newRange)
+
+    @checkSelection()
+
+    @detach(newRange, range)
