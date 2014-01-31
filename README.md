@@ -9,10 +9,10 @@ Nib is intended to be straightforward, to produce clean markup that is consisten
 Development
 -----------
 
-The project uses [Gulp][1] for development and distribution packaging. To get started, first install Gulp globally:
+The project uses [TestEm][1] for TDD and [Gulp][2] for demo and distribution packaging. To get started, first install TestEm and Gulp globally:
 
 ```shell
-$ sudo npm -g install gulp
+$ sudo npm -g install testem gulp
 ```
 
 Then, run npm install to load the local dependencies:
@@ -22,6 +22,14 @@ $ npm install
 ```
 
 **To Develop:**
+
+```shell
+$ testem
+```
+
+This will open a TestEm Chrome Runner. Now you can write/edit tests in the `/test` directory, as well as code in the `src` directory, and it will automatically re-run the tests as you make changes.
+
+**To Demo:**
 
 ```shell
 $ gulp
@@ -38,5 +46,5 @@ $ gulp build
 This will compile the source files only (not the demo scripts) and save both a minified and non-minified version to `dist/`.
 
 
-
-[1]: http://gulpjs.com/
+[1]:https://github.com/airportyh/testem
+[2]: http://gulpjs.com/
