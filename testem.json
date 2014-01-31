@@ -6,6 +6,7 @@
     "test/lib/chai.js",
     "test/lib/rangy-core.js",
     "src/events.coffee",
+    "src/selection_handler.coffee",
     "src/editor.coffee",
     "src/utils.coffee",
     "src/plugins/*.coffee",
@@ -16,6 +17,7 @@
     "test/lib/rangy-core.js",
     "test/compiled/src/events.js",
     "test/compiled/src/utils.js",
+    "test/compiled/src/selection_handler.js",
     "test/compiled/src/editor.js",
     "test/compiled/src/plugins/*.js",
     "test/compiled/*.js"
