@@ -281,6 +281,43 @@ describe "Editor", ->
         expected = "<b>Hello</b> World"
         assert.equal p.innerHTML, expected
 
+  describe "links", ->
+    it "should set href", ->
+      testNodeWithSelection '|click here|', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('http://www.google.com')
+        expected = '<a href="http://www.google.com">click here</a>'
+        assert.equal node.innerHTML, expected
+
+    it "should set http protocol", ->
+      testNodeWithSelection '|click here|', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('www.google.com')
+        expected = '<a href="http://www.google.com">click here</a>'
+        assert.equal node.innerHTML, expected
+
+    it "should not add http to an https protocol", ->
+      testNodeWithSelection '|click here|', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('https://www.google.com')
+        expected = '<a href="https://www.google.com">click here</a>'
+        assert.equal node.innerHTML, expected
+
+    it "should not add http to an ftp protocol", ->
+      testNodeWithSelection '|click here|', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('ftp://www.google.com')
+        expected = '<a href="ftp://www.google.com">click here</a>'
+        assert.equal node.innerHTML, expected
+
+    it "should set http if in middle of url but not the beginning", ->
+      testNodeWithSelection '|click here|', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('www.google-http.com')
+        expected = '<a href="http://www.google-http.com">click here</a>'
+        assert.equal node.innerHTML, expected
+
+
   describe "unwrap", ->
     context "for: <b>|hello|</b>", ->
       it "converts to '|hello|'", ->
@@ -332,3 +369,4 @@ describe "Editor", ->
             assert.equal(node.innerHTML, 'hello')
             markSelection()
             assert.equal(node.innerHTML, 'h|el|lo')
+

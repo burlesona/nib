@@ -104,6 +104,7 @@ class root.Editor extends Events
     @checkSelection()
 
     @detach(range)
+    node
 
   lookForTags: (tagName, nodes) ->
     tags = []

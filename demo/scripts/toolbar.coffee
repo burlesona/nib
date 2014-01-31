@@ -26,18 +26,29 @@ setHandlers = (editor, name) ->
 
 
 createLinkHandlers = (editor) ->
-  link = document.getElementById('link')
-  setOnOffHandlers(editor, 'link', link)
-  link.addEventListener 'click', (event) ->
+  #link = document.getElementById('link')
+  #setOnOffHandlers(editor, 'link', link)
+  #link.addEventListener 'click', (event) ->
+  #  event.preventDefault()
+  #  editor.createLink(prompt('URL:'))
+  #  false
+  
+  link2 = document.getElementById('link2')
+  setOnOffHandlers(editor, 'link2', link2)
+  link2.addEventListener 'click', (event) ->
     event.preventDefault()
     editor.createLink(prompt('URL:'))
     false
-
+  editor.on "report:link2:on", (nodes) ->
+    console.log 'nodes', nodes
+    if nodes.length == 1
+      node = nodes[0]
+      document.querySelector('#url-text').value = node.href
 
 root.initToolbar = (editor) ->
   setHandlers(editor, name) for name in [
     'bold', 'italic', 'underline', 'strikethrough',
     'subscript', 'superscript', 'outdent', 'indent',
-    'bold2'
+    'bold2',
   ]
   createLinkHandlers(editor)
