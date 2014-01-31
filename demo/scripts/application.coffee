@@ -10,7 +10,7 @@ root.ed = new Editor
   node: el,
   plugins: ['bold', 'italic', 'underline', 'strikethrough',
             'subscript', 'superscript', 'link', 'outdent',
-            'indent', 'bold2']
+            'indent', 'bold2', 'link2']
 
 ed.activate (editor) ->
   editor.node.className += ' editing'
