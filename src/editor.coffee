@@ -135,6 +135,9 @@ class root.Editor extends Events
 
     for node in tags
       while (childNode = node.firstChild)
+        # Here we must not delete & recreate nodes,
+        # we just move them. The selection can't be
+        # restored when the nodes gets deleted.
         node.parentNode.insertBefore(childNode, node)
 
       node.remove()
