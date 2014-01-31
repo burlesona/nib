@@ -1,7 +1,6 @@
 # Global Scope
 root = exports ? this
 
-
 class root.Editor extends Events
   @pluginsRegistry: {}
 
@@ -132,27 +131,17 @@ class root.Editor extends Events
 
     tags = @lookForTags(tagName, nodes)
 
-    originalBase = selection.nativeSelection.baseNode
-    originalStart = selection.nativeSelection.baseOffset
-    originalExtent = selection.nativeSelection.extentNode
-    originalEnd = selection.nativeSelection.extentOffset
-
-    newRange = rangy.createRange()
-    newRange.setStart(originalBase, originalStart)
-    newRange.setEnd(originalExtent, originalEnd)
+    selectionHandler = new SelectionHandler()
 
     for node in tags
       while (childNode = node.firstChild)
+        # Here we must not delete & recreate nodes,
+        # we just move them. The selection can't be
+        # restored when the nodes gets deleted.
         node.parentNode.insertBefore(childNode, node)
 
-        if childNode is originalBase
-          newRange.setStart(childNode, originalStart)
-        if childNode is originalExtent
-          newRange.setEnd(childNode, originalEnd)
-
       node.remove()
-    selection.setSingleRange(newRange)
+
+    selectionHandler.restoreSelection()
 
     @checkSelection()
-
-    @detach(newRange, range)

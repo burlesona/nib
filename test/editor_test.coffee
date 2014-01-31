@@ -227,6 +227,29 @@ describe "Test Helpers", ->
 
         assert.equal(node.innerHTML, "h|e<b>ll|o</b>")
 
+describe "SelectionHandler", ->
+  describe "restoreSelection", ->
+    context "for <b>h|ell|o</b>", ->
+      context "moving the text outside the <b>", ->
+        it "restores the selection", ->
+          testNodeWithSelection "<b>h|ell|o</b>", false, (root) ->
+            selection = new SelectionHandler()
+            # root is actually <p><b>hello</b></p>
+            node = root.firstChild
+
+            # move the element outside its container
+            root.insertBefore(node.firstChild, node)
+            # remove old container
+            node.remove()
+
+            # restore selection
+            selection.restoreSelection()
+
+            assert.equal(root.innerHTML, "hello")
+            markSelection()
+            assert.equal(root.innerHTML, "h|ell|o")
+
+
 describe "Editor", ->
   it "should exist", ->
     assert.ok Editor
@@ -298,3 +321,14 @@ describe "Editor", ->
           assert.equal(node.innerHTML, "hello")
           markSelection()
           assert.equal(node.innerHTML, "h|el|lo")
+
+    context "when text is selected backwards", ->
+      context "for: h<b>|e</b><b>l|</b>lo", ->
+        it "converts to 'h|el|lo'", ->
+          testNodeWithSelection 'h<b>|e</b><b>l|</b>lo', true, (node) ->
+            ed = new Editor(node: node)
+
+            ed.unwrap('b')
+            assert.equal(node.innerHTML, 'hello')
+            markSelection()
+            assert.equal(node.innerHTML, 'h|el|lo')
