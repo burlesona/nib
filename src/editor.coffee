@@ -131,7 +131,7 @@ class root.Editor extends Events
 
     tags = @lookForTags(tagName, nodes)
 
-    selection = new SelectionHandler()
+    selectionHandler = new SelectionHandler()
 
     for node in tags
       while (childNode = node.firstChild)
@@ -139,6 +139,6 @@ class root.Editor extends Events
 
       node.remove()
 
-    selection.restoreSelection()
+    selectionHandler.restoreSelection()
 
     @checkSelection()
