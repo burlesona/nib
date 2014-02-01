@@ -8,3 +8,11 @@ p { margin: 0; }
 
 .block { padding: 5px 10px; }
 .block.editing { background: #FFF; }
+
+#content { position: absolute; top: 70px; }
+
+.dialogs { width: 550px; }
+.hidden { display: none; }
+
+#link-text, #fn-text, #kt-text { width: 440px; }
+

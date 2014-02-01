@@ -37,13 +37,34 @@ createLinkHandlers = (editor) ->
   setOnOffHandlers(editor, 'link2', link2)
   link2.addEventListener 'click', (event) ->
     event.preventDefault()
-    editor.createLink(prompt('URL:'))
+    document.querySelector('#link-dialog').classList.remove 'hidden'
+    editor.createLink2 'http://'
+    t = document.querySelector('#link-text')
+    t.value = 'http://'
+    t.focus()
     false
+
+  document.querySelector('#link-save').addEventListener 'click', (event) ->
+    event.preventDefault()
+    editor.updateLink document.querySelector('#link-text').value
+    document.querySelector('#link-dialog').classList.add 'hidden'
+    false
+
+  document.querySelector('#link-cancel').addEventListener 'click', (event) ->
+    event.preventDefault()
+    editor.removeLink()
+    false
+
   editor.on "report:link2:on", (nodes) ->
-    console.log 'nodes', nodes
     if nodes.length == 1
       node = nodes[0]
-      document.querySelector('#url-text').value = node.href
+      document.querySelector('#link-dialog').classList.remove 'hidden'
+      document.querySelector('#link-text').value = node.href
+
+  editor.on "report:link2:off", (nodes) ->
+    document.querySelector('#link-dialog').classList.add 'hidden'
+    document.querySelector('#link-text').value = ''
+
 
 root.initToolbar = (editor) ->
   setHandlers(editor, name) for name in [
@@ -52,3 +73,9 @@ root.initToolbar = (editor) ->
     'bold2',
   ]
   createLinkHandlers(editor)
+
+
+
+
+
+  

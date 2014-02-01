@@ -14,11 +14,19 @@ class root.Link2 extends BasePlugin
   @editorMethods:
     createLink2: (url) ->
       url = "http://#{url}" if url.indexOf('://') is -1
+      console.log 'url', url
       if @wrapped('a')
         @unwrap('a')
       else
         node = @wrap('a')
         node.href = url
+        node.id = "new-link"
+    updateLink: (url) ->
+      node = document.querySelector '#new-link'
+      url = "http://#{url}" if url.indexOf('://') is -1
+      node.href = url
+      node.removeAttribute 'id'
+
   validNodes: ['a']
 
 Editor.register(Link, Link2)
