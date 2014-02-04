@@ -2,7 +2,6 @@
 
 # This UI code is not part of the editor, but merely a demonstration of how
 # to create a UI that can call an editor instance.
-
 root = exports ? this
 
 class root.ToolbarDialogItem
@@ -60,12 +59,12 @@ setHandlers = (editor, name) ->
     false
 
 createLinkHandlers = (editor) ->
-  #link = document.getElementById('link')
-  #setOnOffHandlers(editor, 'link', link)
-  #link.addEventListener 'click', (event) ->
-  #  event.preventDefault()
-  #  editor.createLink(prompt('URL:'))
-  #  false
+  link = document.getElementById('link')
+  setOnOffHandlers(editor, 'link', link)
+  link.addEventListener 'click', (event) ->
+    event.preventDefault()
+    editor.createLink(prompt('URL:'))
+    false
 
   link2 = document.getElementById('link2')
   setOnOffHandlers(editor, 'link2', link2)

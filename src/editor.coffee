@@ -103,13 +103,6 @@ class root.Editor extends Events
     selection.restoreSelection()
     @checkSelection()
 
-  selectElement: (element) ->
-    range = rangy.createRange()
-    range.selectNodeContents(element)
-
-    selection = @getSelection()
-    selection.setSingleRange(range)
-
   wrap: (tagName) ->
     selection = @getSelection()
     range = selection.getRangeAt(0)

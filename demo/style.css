@@ -12,7 +12,6 @@ p { margin: 0; }
 #content { position: absolute; top: 70px; }
 
 .dialogs { width: 550px; }
-.hidden { display: none; }
 
 #link-text, #fn-text, #kt-text { width: 440px; }
 
