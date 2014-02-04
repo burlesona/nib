@@ -87,6 +87,20 @@ class root.Editor extends Events
   detach: (args...) ->
     rangyEl.detach() for rangyEl in args when rangyEl
 
+  saveSelection: () ->
+    new SelectionHandler()
+
+  restoreSelection: (selection) ->
+    selection.restoreSelection()
+    @checkSelection()
+
+  selectElement: (element) ->
+    range = rangy.createRange()
+    range.selectNodeContents(element)
+
+    selection = @getSelection()
+    selection.setSingleRange(range)
+
   wrap: (tagName) ->
     selection = @getSelection()
     range = selection.getRangeAt(0)
@@ -132,7 +146,8 @@ class root.Editor extends Events
 
     tags = @lookForTags(tagName, nodes)
 
-    selectionHandler = new SelectionHandler()
+    #selectionHandler = new SelectionHandler()
+    savedSelection = @saveSelection()
 
     for node in tags
       while (childNode = node.firstChild)
@@ -143,6 +158,7 @@ class root.Editor extends Events
 
       node.remove()
 
-    selectionHandler.restoreSelection()
+    #selectionHandler.restoreSelection()
+    @restoreSelection(savedSelection)
 
     @checkSelection()
