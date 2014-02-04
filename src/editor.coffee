@@ -69,9 +69,8 @@ class root.Editor extends Events
   getSelection: ->
     rangy.getSelection()
 
-  checkSelection: () ->
+  getSelectedNodes: () ->
     selection = @getSelection()
-    range = null
     nodes = []
     if selection.rangeCount
       range = selection.getRangeAt(0)
@@ -81,6 +80,16 @@ class root.Editor extends Events
       else
         nodes = range.getNodes()
       nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, nodes)))
+      range.detach()
+
+    selection.detach()
+    nodes
+
+  checkSelection: () ->
+    nodes = @getSelectedNodes()
+    selection = @getSelection()
+    range = selection.getRangeAt(0) if selection.rangeCount
+
     @trigger('selection:change', selection, range, nodes, selection.toHtml())
     @detach(selection, range)
 
@@ -132,21 +141,14 @@ class root.Editor extends Events
       return node if node.tagName.toLowerCase() == tagName
 
   wrapped: (tagName) ->
-    selection = @getSelection()
-    range = selection.getRangeAt(0)
-    nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, range.getNodes())))
-    @detach(selection, range)
+    nodes = @getSelectedNodes()
 
-    !!@lookForTag(tagName, nodes)
+    @lookForTag(tagName, nodes)
 
   unwrap: (tagName) ->
-    selection = @getSelection()
-    range = selection.getRangeAt(0)
-    nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, range.getNodes())))
-
+    nodes = @getSelectedNodes()
     tags = @lookForTags(tagName, nodes)
 
-    #selectionHandler = new SelectionHandler()
     savedSelection = @saveSelection()
 
     for node in tags
@@ -158,7 +160,6 @@ class root.Editor extends Events
 
       node.remove()
 
-    #selectionHandler.restoreSelection()
     @restoreSelection(savedSelection)
 
     @checkSelection()

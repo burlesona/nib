@@ -10,22 +10,15 @@ class root.Link extends BasePlugin
 class root.Link2 extends BasePlugin
   @pluginName: 'link2'
   @editorMethods:
-    removeLink2: (link) ->
-      @selectElement(link)
+    removeLink2: () ->
       @unwrap('a')
 
     createLink2: (url) ->
       url = "http://#{url}" if url.indexOf('://') is -1
-      if @wrapped('a')
-        @unwrap('a')
-      else
-        node = @wrap('a')
-        node.href = url
-        node
 
-    updateLink: (link, url) ->
-      url = "http://#{url}" if url.indexOf('://') is -1
-      link.href = url
+      node = @wrapped('a') || @wrap('a')
+      node.href = url
+      node
 
   validNodes: ['a']
 

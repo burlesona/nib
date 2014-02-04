@@ -5,7 +5,42 @@
 
 root = exports ? this
 
-currentNodeRef = null
+class root.ToolbarDialogItem
+  constructor: (element) ->
+    @setRoot(element)
+
+  show: () ->
+    @root.classList.remove('hidden')
+
+  hide: () ->
+    @root.classList.add('hidden')
+
+  setRoot: (element) ->
+    @root = element
+
+  getElement: (selector) ->
+    @root.querySelector(selector)
+
+class root.ToolbarDialogs extends root.ToolbarDialogItem
+  constructor: (@container) ->
+    super(@container.contentDocument)
+
+    @linkDialog = @initializeDialogItem('link-dialog')
+    @fnDialog = @initializeDialogItem('fn-dialog')
+    @ktDialog = @initializeDialogItem('kt-dialog')
+
+  initializeDialogItem: (id) ->
+    new root.ToolbarDialogItem(@getElement("##{id}"))
+
+  showLinkDialog: (url, focus = false) ->
+    @linkDialog.show()
+    content = @linkDialog.getElement('.content')
+    content.value = url
+    content.focus() if focus
+
+toolbarDialog = new root.ToolbarDialogs(
+  document.getElementById('dialogs')
+)
 
 setOnOffHandlers = (editor, name, el) ->
   editor.on "report:#{name}:on", () ->
@@ -34,41 +69,40 @@ createLinkHandlers = (editor) ->
 
   link2 = document.getElementById('link2')
   setOnOffHandlers(editor, 'link2', link2)
+
   link2.addEventListener 'click', (event) ->
     event.preventDefault()
-    document.getElementById('link-dialog').classList.remove 'hidden'
-    currentNodeRef = editor.createLink2('http://')
-    t = document.getElementById('link-text')
-    t.value = 'http://'
-    t.focus()
+
+    toolbarDialog.showLinkDialog('http://', true)
+
     false
 
-  document.getElementById('link-save').addEventListener 'click', (event) ->
-    url = document.getElementById('link-text').value
+  linkDialog = toolbarDialog.linkDialog
 
+  linkDialog.getElement('.save').addEventListener 'click', (event) ->
     event.preventDefault()
 
-    editor.updateLink(currentNodeRef, url)
-    document.getElementById('link-dialog').classList.add 'hidden'
+    url = linkDialog.getElement('.content').value
+    editor.createLink2(url)
+    linkDialog.hide()
+
     false
 
-  document.getElementById('link-cancel').addEventListener 'click', (event) ->
+  linkDialog.getElement('.remove').addEventListener 'click', (event) ->
     event.preventDefault()
-    editor.removeLink2(currentNodeRef)
+
+    editor.removeLink2()
+
     false
 
   editor.on "report:link2:on", (nodes) ->
     if nodes.length == 1
       node = nodes[0]
-
-      currentNodeRef = node
-
-      document.getElementById('link-dialog').classList.remove 'hidden'
-      document.getElementById('link-text').value = node.href
+      toolbarDialog.showLinkDialog(node.href)
 
   editor.on "report:link2:off", (nodes) ->
-    document.getElementById('link-dialog').classList.add 'hidden'
-    document.getElementById('link-text').value = ''
+    linkDialog.hide()
+    linkDialog.getElement('.content').value = ''
 
 root.initToolbar = (editor) ->
   setHandlers(editor, name) for name in [

@@ -20,25 +20,30 @@
       <a href="#" id="link2" data-method="createLink2">Link2</a>
     </div>
 
-    <div id="dialogs">
+    <iframe id="dialogs" height="26" border="0" seamless="seamless" srcdoc='
+      <style>
+        body { padding: 0; margin: 0; }
+        .hidden { display: none; }
+      </style>
       <div id="link-dialog" class="hidden">
-        <label>Link: <input id="link-text" value="http://"></label>
-        <input type="submit" id="link-save" value="OK">&nbsp;
-        <input type="button" id="link-cancel" value="Remove">
+          <label>Link: <input class="content" value="http://"></label>
+          <input type="submit" class="save" value="OK">&nbsp;
+          <input type="button" class="remove" value="Remove">
       </div>
 
       <div id="fn-dialog" class="hidden">
-        <label>Footnote: <input id="fn-text" value="http://"></label>
-        <input type="button" id="fn-save" value="OK">&nbsp;
-        <input type="button" id="fn-cancel" value="Cancel">
+        <label>Footnote: <input class="content" value="http://"></label>
+        <input type="button" class="save" value="OK">&nbsp;
+        <input type="button" class="cancel" value="Cancel">
       </div>
 
       <div id="kt-dialog" class="hidden">
-        <label>Key Term: <input id="kt-text" value="http://"></label>
-        <input type="button" id="kt-save" value="OK">&nbsp;
-        <input type="button" id="kt-cancel" value="Cancel">
+        <label>Key Term: <input class="content" value="http://"></label>
+        <input type="button" class="save" value="OK">&nbsp;
+        <input type="button" class="cancel" value="Cancel">
       </div>
-    </div>
+    '>
+    </iframe>
     <div id="content">
       <p id="testblock" class="block">To start experimenting, create a new 
         editor instance and pass this node to its constructor.</p>
