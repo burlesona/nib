@@ -249,7 +249,6 @@ describe "SelectionHandler", ->
             markSelection()
             assert.equal(root.innerHTML, "h|ell|o")
 
-
 describe "Editor", ->
   it "should exist", ->
     assert.ok Editor
@@ -280,6 +279,65 @@ describe "Editor", ->
         ed.toggleBold2()
         expected = "<b>Hello</b> World"
         assert.equal p.innerHTML, expected
+
+  describe "getSelectedNodes", ->
+    it "returns nodes within selection", ->
+      testNodeWithSelection '<b>|hello|<b> <span>world</span>', false, (node) ->
+        ed = new Editor(node: node)
+        nodes = ed.getSelectedNodes()
+
+        assert.equal(2, nodes.length)
+        assert.equal(node.firstChild.firstChild, nodes[0])
+        assert.equal(node.firstChild, nodes[1])
+
+  describe "links", ->
+    it "should set href", ->
+      testNodeWithSelection '|click here|', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('http://www.google.com')
+
+        expected = '<a href="http://www.google.com">click here</a>'
+        assert.equal(node.innerHTML, expected)
+
+    it "should set http protocol", ->
+      testNodeWithSelection '|click here|', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('www.google.com')
+
+        expected = '<a href="http://www.google.com">click here</a>'
+        assert.equal(node.innerHTML, expected)
+
+    it "should not add http to an https protocol", ->
+      testNodeWithSelection '|click here|', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('https://www.google.com')
+
+        expected = '<a href="https://www.google.com">click here</a>'
+        assert.equal(node.innerHTML, expected)
+
+    it "should not add http to an ftp protocol", ->
+      testNodeWithSelection '|click here|', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('ftp://www.google.com')
+
+        expected = '<a href="ftp://www.google.com">click here</a>'
+        assert.equal(node.innerHTML, expected)
+
+    it "should set http if in middle of url but not the beginning", ->
+      testNodeWithSelection '|click here|', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('www.google-http.com')
+
+        expected = '<a href="http://www.google-http.com">click here</a>'
+        assert.equal(node.innerHTML, expected)
+
+    it "should update selected link", ->
+      testNodeWithSelection '<a href="http://a">|click here|</a>', true, (node) ->
+        ed = new Editor(node: node)
+        ed.createLink2('b')
+
+        expected = '<a href="http://b">click here</a>'
+        assert.equal(node.innerHTML, expected)
 
   describe "unwrap", ->
     context "for: <b>|hello|</b>", ->

@@ -17,10 +17,36 @@
       <a href="#" id="indent" data-method="indentParagraph">Indent</a>
       -
       <a href="#" id="bold2" data-method="toggleBold2">Bold(2)</a>
+      <a href="#" id="link2" data-method="createLink2">Link2</a>
     </div>
 
+    <iframe id="dialogs" height="26" border="0" seamless="seamless" srcdoc='
+      <style>
+        body { padding: 0; margin: 0; }
+        .hidden { display: none; }
+      </style>
+      <div id="link-dialog" class="hidden">
+          <label>Link: <input class="content" value="http://"></label>
+          <input type="submit" class="save" value="OK">&nbsp;
+          <input type="button" class="remove" value="Remove">
+      </div>
+
+      <div id="fn-dialog" class="hidden">
+        <label>Footnote: <input class="content" value="http://"></label>
+        <input type="button" class="save" value="OK">&nbsp;
+        <input type="button" class="cancel" value="Cancel">
+      </div>
+
+      <div id="kt-dialog" class="hidden">
+        <label>Key Term: <input class="content" value="http://"></label>
+        <input type="button" class="save" value="OK">&nbsp;
+        <input type="button" class="cancel" value="Cancel">
+      </div>
+    '>
+    </iframe>
     <div id="content">
-      <p id="testblock" class="block">To start experimenting, create a new editor instance and pass this node to its constructor.</p>
+      <p id="testblock" class="block">To start experimenting, create a new 
+        editor instance and pass this node to its constructor.</p>
     </div>
 
     <script src="http://rangy.googlecode.com/svn/trunk/currentrelease/rangy-core.js"></script>

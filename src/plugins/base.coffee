@@ -24,7 +24,7 @@ class root.BasePlugin
   checkSelection: (selection, range, nodes, htmlContent) ->
     nodes = Utils.domNodes(nodes).filter @validNode.bind(@)
     if nodes.length > 0
-      @editor.trigger("report:#{@constructor.pluginName}:on")
+      @editor.trigger("report:#{@constructor.pluginName}:on", nodes)
     else
       @editor.trigger("report:#{@constructor.pluginName}:off")
 
