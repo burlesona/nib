@@ -69,6 +69,22 @@ class root.Editor extends Events
   getSelection: ->
     rangy.getSelection()
 
+  getSelectedNodes: () ->
+    selection = @getSelection()
+    nodes = []
+    if selection.rangeCount
+      range = selection.getRangeAt(0)
+      if range.collapsed
+        if range.startContainer or range.endContainer
+          nodes = [range.startContainer || range.endContainer]
+      else
+        nodes = range.getNodes()
+      nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, nodes)))
+      range.detach()
+
+    selection.detach()
+    nodes
+
   checkSelection: () ->
     selection = @getSelection()
     range = null
@@ -124,11 +140,98 @@ class root.Editor extends Events
 
     !!@lookForTag(tagName, nodes)
 
-  unwrap: (tagName) ->
+  createEmptyCopy: (element) ->
+    copy = element.cloneNode()
+    while (childNode = copy.firstChild)
+      childNode.remove()
+    copy
+
+  # returns the reference to last node
+  unwrapBreakLeft: (element) ->
+    container = element.parentNode
+    containerCopy = @createEmptyCopy(container)
+
+    while (sibling = element.previousSibling)
+      containerCopy.appendChild(sibling)
+
+    if containerCopy.childNodes.length > 0
+      container.parentNode.insertBefore(containerCopy, container.nextSibling)
+      containerCopy
+    else
+      element.parentNode
+
+  # returns the reference to left most element
+  unwrapBreakRight: (element) ->
+    container = element.parentNode
+    containerCopy = @createEmptyCopy(container)
+
+    while (sibling = element.nextSibling)
+      containerCopy.appendChild(sibling)
+
+    nextElement = element.nextSibling
+
+    if containerCopy.childNodes.length > 0
+      container.parentNode.insertBefore(containerCopy, container.nextSibling)
+      containerCopy
+    else
+      nextElement
+      #element.parentNode.nextSibling.nextSibling
+
+  nodeIsWithin: (node, lookup) ->
+    for tag in lookup when tag.contains(node)
+      return tag
+    false
+
+  nodeInList: (node, lookup) ->
+    for element in lookup when node is element
+      return true
+    false
+
+  unwrapBreak: (tagName) ->
     selection = @getSelection()
     range = selection.getRangeAt(0)
-    nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, range.getNodes())))
+    range.splitBoundaries()
 
+
+    nodes = @getSelectedNodes()
+    tags = @lookForTags(tagName, nodes)
+
+    nodes = nodes.reverse()
+    lastNode = null
+    for element in nodes
+      console.log(element, element.nodeType)
+
+      if element.nodeType is 3
+        unless @nodeIsWithin(element, tags)
+          element.parentNode.insertBefore(element, lastNode)
+          lastNode = element
+          continue
+
+        console.log('break')
+        toRemove = element.parentNode
+
+        referenceNode = @unwrapBreakRight(element)
+        @unwrapBreakLeft(element)
+
+        toRemove.parentNode.insertBefore(element, referenceNode)
+        toRemove.remove()
+      else
+        if @nodeInList(element, tags)
+          lastElement = element
+          continue
+        element.parentNode.insertBefore(element, lastNode)
+
+      lastNode = element
+      console.log('current: ', document.getElementsByTagName('p')[0].innerHTML)
+
+    range.selectNodeContents(element)
+    selection.setSingleRange(range)
+
+  unwrap: (tagName, breakNode = false) ->
+    if breakNode
+      return @unwrapBreak(tagName)
+
+    nodes = @getSelectedNodes()
     tags = @lookForTags(tagName, nodes)
 
     selectionHandler = new SelectionHandler()
@@ -142,6 +245,8 @@ class root.Editor extends Events
 
       node.remove()
 
-    selectionHandler.restoreSelection()
+    return
+
+    @restoreSelection(savedSelection)
 
     @checkSelection()

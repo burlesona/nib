@@ -282,13 +282,76 @@ describe "Editor", ->
         assert.equal p.innerHTML, expected
 
   describe "unwrap", ->
+    context "for: |h<b>el|l</b>o", ->
+      it "converts to '|hel|<b>l</b>o'", ->
+        testNodeWithSelection "|h<b>el|l</b>o", false, (node) ->
+          ed = new Editor(node: node)
+
+          ed.unwrap("b", true)
+          assert.equal(node.innerHTML, "hel<b>l</b>o")
+
+      it "keeps the selection", ->
+        testNodeWithSelection "|h<b>el|l</b>o", false, (node) ->
+          ed = new Editor(node: node)
+
+          ed.unwrap("b", true)
+          markSelection()
+          assert.equal(node.innerHTML, "|hel|<b>l</b>o")
+
+    context "for: |<b>hel|lo</b>", ->
+      it "converts to hel<b>lo</b>", ->
+        testNodeWithSelection "|<b>hel|lo</b>", false, (node) ->
+          ed = new Editor(node: node)
+
+          ed.unwrap("b", true)
+          assert.equal(node.textContent, "hello")
+          assert.equal(node.innerHTML, "hel<b>lo</b>")
+
+      it "keeps the selection", ->
+        testNodeWithSelection "<b>hel|lo</b>|", false, (node) ->
+          ed = new Editor(node: node)
+
+          ed.unwrap("b", true)
+          markSelection()
+          assert.equal(node.innerHTML, "<b>hel|</b>lo|")
+
+    context "for: <b>hel|lo</b>|", ->
+      it "converts to <b>hel</b>lo", ->
+        testNodeWithSelection "<b>hel|lo</b>|", false, (node) ->
+          ed = new Editor(node: node)
+
+          ed.unwrap("b", true)
+          assert.equal(node.innerHTML, "<b>hel</b>lo")
+
+      it "keeps the selection", ->
+        testNodeWithSelection "<b>hel|lo</b>|", false, (node) ->
+          ed = new Editor(node: node)
+
+          ed.unwrap("b", true)
+          markSelection()
+          assert.equal(node.innerHTML, "<b>hel|</b>lo|")
+
+    context "for: <b>h|ell|o</b>", ->
+      it "converts to <b>h</b>ell<b>o</b>", ->
+        testNodeWithSelection "<b>h|ell|o</b>", false, (node) ->
+          ed = new Editor(node: node)
+
+          ed.unwrap("b", true)
+          assert.equal(node.innerHTML, "<b>h</b>ell<b>o</b>")
+
     context "for: <b>|hello|</b>", ->
       it "converts to '|hello|'", ->
         testNodeWithSelection "<b>|hello|</b>", false, (node) ->
           ed = new Editor(node: node)
 
-          ed.unwrap("b")
-          assert.equal(node.textContent, "hello")
+          ed.unwrap("b", true)
+          assert.equal(node.innerHTML, "hello")
+
+      it "keeps the selection", ->
+        testNodeWithSelection "<b>|hello|</b>", false, (node) ->
+          ed = new Editor(node: node)
+
+          ed.unwrap("b", true)
           markSelection()
           assert.equal(node.innerHTML, "|hello|")
 
@@ -297,27 +360,18 @@ describe "Editor", ->
         testNodeWithSelection "|h<b>ell</b>o|", false, (node) ->
           ed = new Editor(node: node)
 
-          ed.unwrap("b")
+          ed.unwrap("b", true)
           assert.equal(node.innerHTML, "hello")
           markSelection()
           assert.equal(node.innerHTML, "|hello|")
 
-    context "for: |h<b>el|l</b>o", ->
-      it "converts to '|hel|lo'", ->
-        testNodeWithSelection "|h<b>el|l</b>o", false, (node) ->
-          ed = new Editor(node: node)
-
-          ed.unwrap("b")
-          assert.equal(node.innerHTML, "hello")
-          markSelection()
-          assert.equal(node.innerHTML, "|hel|lo")
 
     context "for: h<b>|e</b><b>l|</b>lo", ->
       it "converts to 'h|el|lo'", ->
         testNodeWithSelection "h<b>|e</b><b>l|</b>lo", false, (node) ->
           ed = new Editor(node: node)
 
-          ed.unwrap("b")
+          ed.unwrap("b", true)
           assert.equal(node.innerHTML, "hello")
           markSelection()
           assert.equal(node.innerHTML, "h|el|lo")
@@ -328,7 +382,7 @@ describe "Editor", ->
           testNodeWithSelection 'h<b>|e</b><b>l|</b>lo', true, (node) ->
             ed = new Editor(node: node)
 
-            ed.unwrap('b')
+            ed.unwrap("b", true)
             assert.equal(node.innerHTML, 'hello')
             markSelection()
             assert.equal(node.innerHTML, 'h|el|lo')
