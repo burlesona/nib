@@ -1,7 +1,88 @@
 var root,
-  __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
+
+root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+root.Events = (function() {
+  function Events() {}
+
+  Events.prototype.handlers = {};
+
+  Events.prototype.on = function(name, handler) {
+    if (this.handlers[name] == null) {
+      this.handlers[name] = [];
+    }
+    this.handlers[name].push(handler);
+    return this;
+  };
+
+  Events.prototype.off = function(name, handler) {
+    if (this.handlers[name] != null) {
+      this.handlers[name] = this.handlers[name].filter(function(fn) {
+        return fn === !handler;
+      });
+    }
+    return this;
+  };
+
+  Events.prototype.trigger = function() {
+    var args, fn, name, _i, _len, _ref;
+    name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+    _ref = this.handlers[name] || [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      fn = _ref[_i];
+      fn.apply(null, [this].concat(__slice.call(args)));
+    }
+    return this;
+  };
+
+  Events.prototype.clear = function() {
+    return this.handlers = {};
+  };
+
+  return Events;
+
+})();
+
+var root;
+
+root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+root.SelectionHandler = (function() {
+  function SelectionHandler() {
+    this.selection = rangy.getSelection();
+    this.baseNode = this.selection.nativeSelection.baseNode;
+    this.baseOffset = this.selection.nativeSelection.baseOffset;
+    this.extentNode = this.selection.nativeSelection.extentNode;
+    this.extentOffset = this.selection.nativeSelection.extentOffset;
+    this.backwards = this.selection.isBackwards();
+  }
+
+  SelectionHandler.prototype.restoreSelection = function() {
+    var endRange, startRange;
+    startRange = rangy.createRange();
+    startRange.setStart(this.baseNode, this.baseOffset);
+    this.selection.removeAllRanges();
+    if (this.backwards) {
+      startRange.setEnd(this.baseNode, this.baseOffset);
+      endRange = rangy.createRange();
+      endRange.setStart(this.extentNode, this.extentOffset);
+      endRange.setEnd(this.extentNode, this.extentOffset);
+      this.selection.addRange(startRange);
+      this.selection.addRange(endRange, true);
+      endRange.detach();
+    } else {
+      startRange.setEnd(this.extentNode, this.extentOffset);
+      this.selection.setSingleRange(startRange);
+    }
+    return startRange.detach();
+  };
+
+  return SelectionHandler;
+
+})();
+
+var root;
 
 root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
@@ -63,6 +144,13 @@ root.Utils = (function() {
 
 })();
 
+var root,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  __slice = [].slice;
+
+root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
 root.Editor = (function(_super) {
   __extends(Editor, _super);
 
@@ -87,7 +175,7 @@ root.Editor = (function(_super) {
     this.originalContent = this.node.innerHTML;
   }
 
-  Editor.prototype.activate = function(callback) {
+  Editor.prototype.activate = function() {
     var name;
     this.node.setAttribute('contenteditable', true);
     if (this.opts.plugins != null) {
@@ -103,12 +191,10 @@ root.Editor = (function(_super) {
       }).call(this);
     }
     this.initDOMEvents();
-    if (callback != null) {
-      return callback(this);
-    }
+    return this.trigger('editor:on');
   };
 
-  Editor.prototype.deactivate = function(callback) {
+  Editor.prototype.deactivate = function() {
     var plugin, _i, _len, _ref;
     this.node.setAttribute('contenteditable', false);
     if (this.plugins) {
@@ -120,9 +206,7 @@ root.Editor = (function(_super) {
     }
     this.deactivateDOMEvents();
     this.clear();
-    if (callback != null) {
-      return callback(this);
-    }
+    return this.trigger('editor:off');
   };
 
   Editor.prototype.hasChanged = function() {
@@ -179,10 +263,9 @@ root.Editor = (function(_super) {
     return rangy.getSelection();
   };
 
-  Editor.prototype.checkSelection = function() {
+  Editor.prototype.getSelectedNodes = function() {
     var nodes, range, selection;
     selection = this.getSelection();
-    range = null;
     nodes = [];
     if (selection.rangeCount) {
       range = selection.getRangeAt(0);
@@ -194,56 +277,109 @@ root.Editor = (function(_super) {
         nodes = range.getNodes();
       }
       nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(this.node, nodes)));
+      range.detach();
     }
-    return this.trigger('selection:change', selection, range, nodes, selection.toHtml());
+    selection.detach();
+    return nodes;
+  };
+
+  Editor.prototype.checkSelection = function() {
+    var nodes, range, selection;
+    nodes = this.getSelectedNodes();
+    selection = this.getSelection();
+    if (selection.rangeCount) {
+      range = selection.getRangeAt(0);
+    }
+    this.trigger('selection:change', selection, range, nodes, selection.toHtml());
+    return this.detach(selection, range);
+  };
+
+  Editor.prototype.detach = function() {
+    var args, rangyEl, _i, _len, _results;
+    args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+    _results = [];
+    for (_i = 0, _len = args.length; _i < _len; _i++) {
+      rangyEl = args[_i];
+      if (rangyEl) {
+        _results.push(rangyEl.detach());
+      }
+    }
+    return _results;
+  };
+
+  Editor.prototype.saveSelection = function() {
+    return new SelectionHandler();
+  };
+
+  Editor.prototype.restoreSelection = function(selection) {
+    selection.restoreSelection();
+    return this.checkSelection();
+  };
+
+  Editor.prototype.wrap = function(tagName) {
+    var newRange, node, range, selection;
+    selection = this.getSelection();
+    range = selection.getRangeAt(0);
+    node = document.createElement(tagName);
+    if (range.canSurroundContents()) {
+      range.surroundContents(node);
+    }
+    newRange = rangy.createRange();
+    newRange.selectNodeContents(node);
+    selection.setSingleRange(newRange);
+    this.checkSelection();
+    this.detach(range);
+    return node;
+  };
+
+  Editor.prototype.lookForTags = function(tagName, nodes) {
+    var node, tags, _i, _len;
+    tags = [];
+    for (_i = 0, _len = nodes.length; _i < _len; _i++) {
+      node = nodes[_i];
+      if (node.nodeType === 1) {
+        if (node.tagName.toLowerCase() === tagName) {
+          tags.push(node);
+        }
+      }
+    }
+    return tags;
+  };
+
+  Editor.prototype.lookForTag = function(tagName, nodes) {
+    var node, _i, _len;
+    for (_i = 0, _len = nodes.length; _i < _len; _i++) {
+      node = nodes[_i];
+      if (node.nodeType === 1) {
+        if (node.tagName.toLowerCase() === tagName) {
+          return node;
+        }
+      }
+    }
+  };
+
+  Editor.prototype.wrapped = function(tagName) {
+    var nodes;
+    nodes = this.getSelectedNodes();
+    return this.lookForTag(tagName, nodes);
+  };
+
+  Editor.prototype.unwrap = function(tagName) {
+    var childNode, node, nodes, savedSelection, tags, _i, _len;
+    nodes = this.getSelectedNodes();
+    tags = this.lookForTags(tagName, nodes);
+    savedSelection = this.saveSelection();
+    for (_i = 0, _len = tags.length; _i < _len; _i++) {
+      node = tags[_i];
+      while ((childNode = node.firstChild)) {
+        node.parentNode.insertBefore(childNode, node);
+      }
+      node.remove();
+    }
+    this.restoreSelection(savedSelection);
+    return this.checkSelection();
   };
 
   return Editor;
 
 })(Events);
-
-var root,
-  __slice = [].slice;
-
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
-root.Events = (function() {
-  function Events() {}
-
-  Events.prototype.handlers = {};
-
-  Events.prototype.on = function(name, handler) {
-    if (this.handlers[name] == null) {
-      this.handlers[name] = [];
-    }
-    this.handlers[name].push(handler);
-    return this;
-  };
-
-  Events.prototype.off = function(name, handler) {
-    if (this.handlers[name] != null) {
-      this.handlers[name] = this.handlers[name].filter(function(fn) {
-        return fn === !handler;
-      });
-    }
-    return this;
-  };
-
-  Events.prototype.trigger = function() {
-    var args, fn, name, _i, _len, _ref;
-    name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    _ref = this.handlers[name] || [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      fn = _ref[_i];
-      fn.apply(null, args);
-    }
-    return this;
-  };
-
-  Events.prototype.clear = function() {
-    return this.handlers = {};
-  };
-
-  return Events;
-
-})();

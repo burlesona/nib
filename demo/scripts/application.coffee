@@ -12,7 +12,8 @@ root.ed = new Editor
             'subscript', 'superscript', 'link', 'outdent',
             'indent', 'bold2', 'link2']
 
-ed.activate (editor) ->
+ed.on 'editor:on', (editor) ->
   editor.node.className += ' editing'
+ed.activate (editor) ->
 
 root.initToolbar(ed)

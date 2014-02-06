@@ -42,10 +42,10 @@ toolbarDialog = new root.ToolbarDialogs(
 )
 
 setOnOffHandlers = (editor, name, el) ->
-  editor.on "report:#{name}:on", () ->
+  editor.on "report:#{name}:on", (editor) ->
     el.style.fontWeight = 'bold'
 
-  editor.on "report:#{name}:off", () ->
+  editor.on "report:#{name}:off", (editor) ->
     el.style.fontWeight = 'normal'
 
 setHandlers = (editor, name) ->
@@ -94,12 +94,12 @@ createLinkHandlers = (editor) ->
 
     false
 
-  editor.on "report:link2:on", (nodes) ->
+  editor.on "report:link2:on", (editor, nodes) ->
     if nodes.length == 1
       node = nodes[0]
       toolbarDialog.showLinkDialog(node.href)
 
-  editor.on "report:link2:off", (nodes) ->
+  editor.on "report:link2:off", (editor, nodes) ->
     linkDialog.hide()
     linkDialog.getElement('.content').value = ''
 
