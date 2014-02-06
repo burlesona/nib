@@ -30,8 +30,8 @@ root.BasePlugin = (function() {
 
   BasePlugin.prototype.initEvents = function() {
     var _this = this;
-    return this.editor.on('selection:change', function(selection, range, nodes, htmlContent) {
-      return _this.checkSelection(selection, range, nodes, htmlContent);
+    return this.editor.on('selection:change', function(editor, selection, range, nodes, htmlContent) {
+      return _this.checkSelection(editor, selection, range, nodes, htmlContent);
     });
   };
 
@@ -40,12 +40,12 @@ root.BasePlugin = (function() {
     return _ref = node.nodeName.toLowerCase(), __indexOf.call(this.validNodes, _ref) >= 0;
   };
 
-  BasePlugin.prototype.checkSelection = function(selection, range, nodes, htmlContent) {
+  BasePlugin.prototype.checkSelection = function(editor, selection, range, nodes, htmlContent) {
     nodes = Utils.domNodes(nodes).filter(this.validNode.bind(this));
     if (nodes.length > 0) {
-      return this.editor.trigger("report:" + this.constructor.pluginName + ":on", nodes);
+      return editor.trigger("report:" + this.constructor.pluginName + ":on", nodes);
     } else {
-      return this.editor.trigger("report:" + this.constructor.pluginName + ":off");
+      return editor.trigger("report:" + this.constructor.pluginName + ":off");
     }
   };
 
@@ -72,10 +72,10 @@ root.MetaKeyAction = (function(_super) {
   MetaKeyAction.prototype.initEvents = function() {
     var _this = this;
     MetaKeyAction.__super__.initEvents.call(this);
-    return this.editor.on('keydown', function(event) {
+    return this.editor.on('keydown', function(editor, event) {
       if ((event.ctrlKey || event.metaKey) && event.which === _this.key) {
         event.preventDefault();
-        return _this.editor[_this.method]();
+        return editor[_this.method]();
       }
     });
   };

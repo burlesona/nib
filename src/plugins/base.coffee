@@ -15,18 +15,18 @@ class root.BasePlugin
     @initEvents()
 
   initEvents: ->
-    @editor.on 'selection:change', (selection, range, nodes, htmlContent) =>
-      @checkSelection(selection, range, nodes, htmlContent)
+    @editor.on 'selection:change', (editor, selection, range, nodes, htmlContent) =>
+      @checkSelection(editor, selection, range, nodes, htmlContent)
 
   validNode: (node) ->
     node.nodeName.toLowerCase() in @validNodes
 
-  checkSelection: (selection, range, nodes, htmlContent) ->
+  checkSelection: (editor, selection, range, nodes, htmlContent) ->
     nodes = Utils.domNodes(nodes).filter @validNode.bind(@)
     if nodes.length > 0
-      @editor.trigger("report:#{@constructor.pluginName}:on", nodes)
+      editor.trigger("report:#{@constructor.pluginName}:on", nodes)
     else
-      @editor.trigger("report:#{@constructor.pluginName}:off")
+      editor.trigger("report:#{@constructor.pluginName}:off")
 
   deactivate: () ->
     null
@@ -38,7 +38,7 @@ class root.MetaKeyAction extends BasePlugin
 
   initEvents: ->
     super()
-    @editor.on 'keydown', (event) =>
+    @editor.on 'keydown', (editor, event) =>
       if (event.ctrlKey or event.metaKey) and event.which == @key
         event.preventDefault()
-        @editor[@method]()
+        editor[@method]()

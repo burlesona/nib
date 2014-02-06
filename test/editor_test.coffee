@@ -390,3 +390,11 @@ describe "Editor", ->
             assert.equal(node.innerHTML, 'hello')
             markSelection()
             assert.equal(node.innerHTML, 'h|el|lo')
+
+  describe "events", ->
+    it "should pass editor as first parameter to event handlers", ->
+      testNode 'p', 'Here is some sample text', (p) ->
+        ed = new Editor node: p
+        ed.on 'editor:on', (editor) ->
+          assert.equal editor, ed
+        ed.activate()

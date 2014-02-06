@@ -31,7 +31,7 @@ root.Events = (function() {
     _ref = this.handlers[name] || [];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       fn = _ref[_i];
-      fn.apply(null, args);
+      fn.apply(null, [this].concat(__slice.call(args)));
     }
     return this;
   };
