@@ -1,4 +1,5 @@
 var root, _ref,
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -8,6 +9,8 @@ root.BasePlugin = (function() {
   BasePlugin.pluginName = '';
 
   BasePlugin.editorMethods = {};
+
+  BasePlugin.prototype.validNodes = [];
 
   BasePlugin.extendEditor = function(Editor) {
     var method, name, _ref, _results;
@@ -33,15 +36,16 @@ root.BasePlugin = (function() {
   };
 
   BasePlugin.prototype.validNode = function(node) {
-    return false;
+    var _ref;
+    return _ref = node.nodeName.toLowerCase(), __indexOf.call(this.validNodes, _ref) >= 0;
   };
 
   BasePlugin.prototype.checkSelection = function(selection, range, nodes, htmlContent) {
-    nodes = Utils.domNodes(nodes).filter(this.validNode);
+    nodes = Utils.domNodes(nodes).filter(this.validNode.bind(this));
     if (nodes.length > 0) {
-      return this.editor.trigger("report:" + this.pluginName + ":on");
+      return this.editor.trigger("report:" + this.constructor.pluginName + ":on", nodes);
     } else {
-      return this.editor.trigger("report:" + this.pluginName + ":off");
+      return this.editor.trigger("report:" + this.constructor.pluginName + ":off");
     }
   };
 
@@ -80,7 +84,63 @@ root.MetaKeyAction = (function(_super) {
 
 })(BasePlugin);
 
-var root, _ref,
+var root, _ref, _ref1,
+  __hasProp = {}.hasOwnProperty,
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+root.Indent = (function(_super) {
+  __extends(Indent, _super);
+
+  function Indent() {
+    _ref = Indent.__super__.constructor.apply(this, arguments);
+    return _ref;
+  }
+
+  Indent.pluginName = 'indent';
+
+  Indent.editorMethods = {
+    indentParagraph: function() {
+      return this.exec('indent');
+    }
+  };
+
+  Indent.prototype.validNodes = ['blockquote'];
+
+  return Indent;
+
+})(BasePlugin);
+
+root.Outdent = (function(_super) {
+  __extends(Outdent, _super);
+
+  function Outdent() {
+    _ref1 = Outdent.__super__.constructor.apply(this, arguments);
+    return _ref1;
+  }
+
+  Outdent.pluginName = 'outdent';
+
+  Outdent.editorMethods = {
+    outdentParagraph: function() {
+      var quote;
+      quote = this.node.querySelector('blockquote');
+      if (quote) {
+        return quote.outerHTML = quote.innerHTML;
+      }
+    }
+  };
+
+  Outdent.prototype.validNodes = ['blockquote'];
+
+  return Outdent;
+
+})(BasePlugin);
+
+Editor.register(Indent, Outdent);
+
+var root, _ref, _ref1,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -102,17 +162,46 @@ root.Link = (function(_super) {
     }
   };
 
-  Link.prototype.validNode = function(node) {
-    return node.nodeName === 'A';
-  };
+  Link.prototype.validNodes = ['a'];
 
   return Link;
 
 })(BasePlugin);
 
-Editor.register(Link);
+root.Link2 = (function(_super) {
+  __extends(Link2, _super);
 
-var root, _ref, _ref1, _ref2, _ref3, _ref4, _ref5,
+  function Link2() {
+    _ref1 = Link2.__super__.constructor.apply(this, arguments);
+    return _ref1;
+  }
+
+  Link2.pluginName = 'link2';
+
+  Link2.editorMethods = {
+    removeLink2: function() {
+      return this.unwrap('a');
+    },
+    createLink2: function(url) {
+      var node;
+      if (url.indexOf('://') === -1) {
+        url = "http://" + url;
+      }
+      node = this.wrapped('a') || this.wrap('a');
+      node.href = url;
+      return node;
+    }
+  };
+
+  Link2.prototype.validNodes = ['a'];
+
+  return Link2;
+
+})(BasePlugin);
+
+Editor.register(Link, Link2);
+
+var root, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -138,9 +227,7 @@ root.BoldText = (function(_super) {
 
   BoldText.prototype.method = 'toggleBold';
 
-  BoldText.prototype.validNode = function(node) {
-    return node.nodeName === 'B' || node.nodeName === 'STRONG';
-  };
+  BoldText.prototype.validNodes = ['b', 'strong'];
 
   return BoldText;
 
@@ -166,9 +253,7 @@ root.ItalicText = (function(_super) {
 
   ItalicText.prototype.method = 'toggleItalic';
 
-  ItalicText.prototype.validNode = function(node) {
-    return node.nodeName === 'I' || node.nodeName === 'EM';
-  };
+  ItalicText.prototype.validNodes = ['i', 'em'];
 
   return ItalicText;
 
@@ -194,9 +279,7 @@ root.Underline = (function(_super) {
 
   Underline.prototype.method = 'toggleUnderline';
 
-  Underline.prototype.validNode = function(node) {
-    return node.nodeName === 'U';
-  };
+  Underline.prototype.validNodes = ['u'];
 
   return Underline;
 
@@ -218,9 +301,7 @@ root.StrikeThrough = (function(_super) {
     }
   };
 
-  StrikeThrough.prototype.validNode = function(node) {
-    return node.nodeName === 'STRIKE';
-  };
+  StrikeThrough.prototype.validNodes = ['strike'];
 
   return StrikeThrough;
 
@@ -242,9 +323,7 @@ root.Subscript = (function(_super) {
     }
   };
 
-  Subscript.prototype.validNode = function(node) {
-    return node.nodeName === 'SUB';
-  };
+  Subscript.prototype.validNodes = ['sub'];
 
   return Subscript;
 
@@ -266,12 +345,38 @@ root.Superscript = (function(_super) {
     }
   };
 
-  Superscript.prototype.validNode = function(node) {
-    return node.nodeName === 'SUP';
-  };
+  Superscript.prototype.validNodes = ['sup'];
 
   return Superscript;
 
 })(BasePlugin);
 
-Editor.register(BoldText, ItalicText, Underline, StrikeThrough, Subscript, Superscript);
+root.BoldText2 = (function(_super) {
+  __extends(BoldText2, _super);
+
+  function BoldText2() {
+    _ref6 = BoldText2.__super__.constructor.apply(this, arguments);
+    return _ref6;
+  }
+
+  BoldText2.pluginName = 'bold2';
+
+  BoldText2.editorMethods = {
+    toggleBold2: function() {
+      if (this.wrapped('b')) {
+        return this.unwrap('b');
+      } else if (this.wrapped('strong')) {
+        return this.unwrap('strong');
+      } else {
+        return this.wrap('b');
+      }
+    }
+  };
+
+  BoldText2.prototype.validNodes = ['b', 'strong'];
+
+  return BoldText2;
+
+})(BasePlugin);
+
+Editor.register(BoldText, ItalicText, Underline, StrikeThrough, Subscript, Superscript, BoldText2);
