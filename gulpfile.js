@@ -9,7 +9,7 @@ var coffee = require('gulp-coffee');
 
 var path = {
   src: {
-    core: './src/*.coffee',
+    core: ['./src/events.coffee', './src/selection_handler.coffee', './src/utils.coffee', './src/editor.coffee'],
     plugins: './src/plugins/*.coffee',
     demo: './demo/scripts/*.coffee'
   },

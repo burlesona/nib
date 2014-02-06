@@ -1,4 +1,150 @@
 var root,
+  __slice = [].slice;
+
+root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+root.Events = (function() {
+  function Events() {}
+
+  Events.prototype.handlers = {};
+
+  Events.prototype.on = function(name, handler) {
+    if (this.handlers[name] == null) {
+      this.handlers[name] = [];
+    }
+    this.handlers[name].push(handler);
+    return this;
+  };
+
+  Events.prototype.off = function(name, handler) {
+    if (this.handlers[name] != null) {
+      this.handlers[name] = this.handlers[name].filter(function(fn) {
+        return fn === !handler;
+      });
+    }
+    return this;
+  };
+
+  Events.prototype.trigger = function() {
+    var args, fn, name, _i, _len, _ref;
+    name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
+    _ref = this.handlers[name] || [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      fn = _ref[_i];
+      fn.apply(null, args);
+    }
+    return this;
+  };
+
+  Events.prototype.clear = function() {
+    return this.handlers = {};
+  };
+
+  return Events;
+
+})();
+
+var root;
+
+root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+root.SelectionHandler = (function() {
+  function SelectionHandler() {
+    this.selection = rangy.getSelection();
+    this.baseNode = this.selection.nativeSelection.baseNode;
+    this.baseOffset = this.selection.nativeSelection.baseOffset;
+    this.extentNode = this.selection.nativeSelection.extentNode;
+    this.extentOffset = this.selection.nativeSelection.extentOffset;
+    this.backwards = this.selection.isBackwards();
+  }
+
+  SelectionHandler.prototype.restoreSelection = function() {
+    var endRange, startRange;
+    startRange = rangy.createRange();
+    startRange.setStart(this.baseNode, this.baseOffset);
+    this.selection.removeAllRanges();
+    if (this.backwards) {
+      startRange.setEnd(this.baseNode, this.baseOffset);
+      endRange = rangy.createRange();
+      endRange.setStart(this.extentNode, this.extentOffset);
+      endRange.setEnd(this.extentNode, this.extentOffset);
+      this.selection.addRange(startRange);
+      this.selection.addRange(endRange, true);
+      endRange.detach();
+    } else {
+      startRange.setEnd(this.extentNode, this.extentOffset);
+      this.selection.setSingleRange(startRange);
+    }
+    return startRange.detach();
+  };
+
+  return SelectionHandler;
+
+})();
+
+var root;
+
+root = typeof exports !== "undefined" && exports !== null ? exports : this;
+
+root.Utils = (function() {
+  function Utils() {}
+
+  Utils.parentNodes = function(stopNode, node) {
+    var n, parents, _i, _len, _results;
+    if (node instanceof Array) {
+      _results = [];
+      for (_i = 0, _len = node.length; _i < _len; _i++) {
+        n = node[_i];
+        _results.push(this.parentNodes(stopNode, n));
+      }
+      return _results;
+    } else {
+      parents = [];
+      while (node && node !== stopNode) {
+        parents.push(node);
+        node = node.parentNode;
+      }
+      return parents;
+    }
+  };
+
+  Utils.flatten = function(arr) {
+    if (arr.length === 0) {
+      return [];
+    }
+    return arr.reduce(function(lhs, rhs) {
+      return lhs.concat(rhs);
+    });
+  };
+
+  Utils.uniqueNodes = function(arr) {
+    var node, nodes, _i, _j, _len, _len1;
+    nodes = [];
+    for (_i = 0, _len = arr.length; _i < _len; _i++) {
+      node = arr[_i];
+      if (!node._visited) {
+        nodes.push(node);
+      }
+      node._visited = true;
+    }
+    for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
+      node = nodes[_j];
+      node._visited = false;
+    }
+    return nodes;
+  };
+
+  Utils.domNodes = function(nodes) {
+    return nodes.filter(function(n) {
+      return n.nodeType === 1;
+    });
+  };
+
+  return Utils;
+
+})();
+
+var root,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
@@ -237,149 +383,3 @@ root.Editor = (function(_super) {
   return Editor;
 
 })(Events);
-
-var root,
-  __slice = [].slice;
-
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
-root.Events = (function() {
-  function Events() {}
-
-  Events.prototype.handlers = {};
-
-  Events.prototype.on = function(name, handler) {
-    if (this.handlers[name] == null) {
-      this.handlers[name] = [];
-    }
-    this.handlers[name].push(handler);
-    return this;
-  };
-
-  Events.prototype.off = function(name, handler) {
-    if (this.handlers[name] != null) {
-      this.handlers[name] = this.handlers[name].filter(function(fn) {
-        return fn === !handler;
-      });
-    }
-    return this;
-  };
-
-  Events.prototype.trigger = function() {
-    var args, fn, name, _i, _len, _ref;
-    name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    _ref = this.handlers[name] || [];
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      fn = _ref[_i];
-      fn.apply(null, args);
-    }
-    return this;
-  };
-
-  Events.prototype.clear = function() {
-    return this.handlers = {};
-  };
-
-  return Events;
-
-})();
-
-var root;
-
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
-root.SelectionHandler = (function() {
-  function SelectionHandler() {
-    this.selection = rangy.getSelection();
-    this.baseNode = this.selection.nativeSelection.baseNode;
-    this.baseOffset = this.selection.nativeSelection.baseOffset;
-    this.extentNode = this.selection.nativeSelection.extentNode;
-    this.extentOffset = this.selection.nativeSelection.extentOffset;
-    this.backwards = this.selection.isBackwards();
-  }
-
-  SelectionHandler.prototype.restoreSelection = function() {
-    var endRange, startRange;
-    startRange = rangy.createRange();
-    startRange.setStart(this.baseNode, this.baseOffset);
-    this.selection.removeAllRanges();
-    if (this.backwards) {
-      startRange.setEnd(this.baseNode, this.baseOffset);
-      endRange = rangy.createRange();
-      endRange.setStart(this.extentNode, this.extentOffset);
-      endRange.setEnd(this.extentNode, this.extentOffset);
-      this.selection.addRange(startRange);
-      this.selection.addRange(endRange, true);
-      endRange.detach();
-    } else {
-      startRange.setEnd(this.extentNode, this.extentOffset);
-      this.selection.setSingleRange(startRange);
-    }
-    return startRange.detach();
-  };
-
-  return SelectionHandler;
-
-})();
-
-var root;
-
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
-root.Utils = (function() {
-  function Utils() {}
-
-  Utils.parentNodes = function(stopNode, node) {
-    var n, parents, _i, _len, _results;
-    if (node instanceof Array) {
-      _results = [];
-      for (_i = 0, _len = node.length; _i < _len; _i++) {
-        n = node[_i];
-        _results.push(this.parentNodes(stopNode, n));
-      }
-      return _results;
-    } else {
-      parents = [];
-      while (node && node !== stopNode) {
-        parents.push(node);
-        node = node.parentNode;
-      }
-      return parents;
-    }
-  };
-
-  Utils.flatten = function(arr) {
-    if (arr.length === 0) {
-      return [];
-    }
-    return arr.reduce(function(lhs, rhs) {
-      return lhs.concat(rhs);
-    });
-  };
-
-  Utils.uniqueNodes = function(arr) {
-    var node, nodes, _i, _j, _len, _len1;
-    nodes = [];
-    for (_i = 0, _len = arr.length; _i < _len; _i++) {
-      node = arr[_i];
-      if (!node._visited) {
-        nodes.push(node);
-      }
-      node._visited = true;
-    }
-    for (_j = 0, _len1 = nodes.length; _j < _len1; _j++) {
-      node = nodes[_j];
-      node._visited = false;
-    }
-    return nodes;
-  };
-
-  Utils.domNodes = function(nodes) {
-    return nodes.filter(function(n) {
-      return n.nodeType === 1;
-    });
-  };
-
-  return Utils;
-
-})();
