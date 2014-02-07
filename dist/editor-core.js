@@ -4,9 +4,9 @@ var root,
 root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
 root.Events = (function() {
-  function Events() {}
-
-  Events.prototype.handlers = {};
+  function Events() {
+    this.handlers = {};
+  }
 
   Events.prototype.on = function(name, handler) {
     if (this.handlers[name] == null) {
@@ -173,6 +173,7 @@ root.Editor = (function(_super) {
     this.node = opts.node;
     this.originalClass = this.node.className;
     this.originalContent = this.node.innerHTML;
+    Editor.__super__.constructor.call(this, opts);
   }
 
   Editor.prototype.activate = function() {

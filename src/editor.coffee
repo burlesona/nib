@@ -14,6 +14,7 @@ class root.Editor extends Events
     @node = opts.node
     @originalClass = @node.className
     @originalContent = @node.innerHTML
+    super(opts)
 
   activate: () ->
     @node.setAttribute 'contenteditable', true
