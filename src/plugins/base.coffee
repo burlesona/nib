@@ -4,13 +4,13 @@ root = exports ? this
 class root.BasePlugin
   @pluginName: ''
   @editorMethods: {}
-  validNodes: []
 
   @extendEditor: (Editor) ->
     for name, method of @editorMethods
       Editor::[name] = method
 
   constructor: (editor) ->
+    @validNodes = []
     @editor = editor
     @initEvents()
 

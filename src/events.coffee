@@ -3,7 +3,8 @@ root = exports ? this
 
 
 class root.Events
-  handlers: {}
+  constructor: () ->
+    @handlers = {}
 
   on: (name, handler) ->
     @handlers[name] = [] unless @handlers[name]?
