@@ -10,8 +10,6 @@ root.BasePlugin = (function() {
 
   BasePlugin.editorMethods = {};
 
-  BasePlugin.prototype.validNodes = [];
-
   BasePlugin.extendEditor = function(Editor) {
     var method, name, _ref, _results;
     _ref = this.editorMethods;
@@ -24,6 +22,7 @@ root.BasePlugin = (function() {
   };
 
   function BasePlugin(editor) {
+    this.validNodes = [];
     this.editor = editor;
     this.initEvents();
   }

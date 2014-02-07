@@ -206,8 +206,8 @@ root.Editor = (function(_super) {
       }
     }
     this.deactivateDOMEvents();
-    this.clear();
-    return this.trigger('editor:off');
+    this.trigger('editor:off');
+    return this.clear();
   };
 
   Editor.prototype.hasChanged = function() {
