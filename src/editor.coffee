@@ -26,8 +26,8 @@ class root.Editor extends Events
     @node.setAttribute 'contenteditable', false
     plugin.deactivate() for plugin in @plugins if @plugins
     @deactivateDOMEvents()
-    @clear()
     @trigger('editor:off')
+    @clear()
 
   hasChanged: ->
     @node.innerHTML != @originalContent
