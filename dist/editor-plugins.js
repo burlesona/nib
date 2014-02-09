@@ -22,30 +22,31 @@ root.BasePlugin = (function() {
   };
 
   function BasePlugin(editor) {
-    this.validNodes = [];
     this.editor = editor;
     this.initEvents();
   }
 
-  BasePlugin.prototype.initEvents = function() {
-    var _this = this;
-    return this.editor.on('selection:change', function(editor, selection, range, nodes, htmlContent) {
-      return _this.checkSelection(editor, selection, range, nodes, htmlContent);
-    });
-  };
+  BasePlugin.prototype.initEvents = function() {};
 
   BasePlugin.prototype.validNode = function(node) {
     var _ref;
     return _ref = node.nodeName.toLowerCase(), __indexOf.call(this.validNodes, _ref) >= 0;
   };
 
-  BasePlugin.prototype.checkSelection = function(editor, selection, range, nodes, htmlContent) {
-    nodes = Utils.domNodes(nodes).filter(this.validNode.bind(this));
-    if (nodes.length > 0) {
-      return editor.trigger("report:" + this.constructor.pluginName + ":on", nodes);
-    } else {
-      return editor.trigger("report:" + this.constructor.pluginName + ":off");
+  BasePlugin.prototype.selectionNodes = function(nodes) {
+    if (nodes == null) {
+      nodes = [];
     }
+    return Utils.domNodes(nodes).filter(this.validNode.bind(this));
+  };
+
+  BasePlugin.prototype.checkSelection = function(editor, opts) {
+    var nodes;
+    if (opts == null) {
+      opts = {};
+    }
+    nodes = this.selectionNodes(opts.nodes);
+    return (this.selectionNodes(opts.nodes).length === 0 ? '-' : '') + this.constructor.pluginName;
   };
 
   BasePlugin.prototype.deactivate = function() {

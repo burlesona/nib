@@ -10,23 +10,20 @@ class root.BasePlugin
       Editor::[name] = method
 
   constructor: (editor) ->
-    @validNodes = []
     @editor = editor
     @initEvents()
 
   initEvents: ->
-    @editor.on 'selection:change', (editor, selection, range, nodes, htmlContent) =>
-      @checkSelection(editor, selection, range, nodes, htmlContent)
 
   validNode: (node) ->
     node.nodeName.toLowerCase() in @validNodes
 
-  checkSelection: (editor, selection, range, nodes, htmlContent) ->
-    nodes = Utils.domNodes(nodes).filter @validNode.bind(@)
-    if nodes.length > 0
-      editor.trigger("report:#{@constructor.pluginName}:on", nodes)
-    else
-      editor.trigger("report:#{@constructor.pluginName}:off")
+  selectionNodes: (nodes = []) ->
+    Utils.domNodes(nodes).filter @validNode.bind(@)
+
+  checkSelection: (editor, opts = {}) ->
+    nodes = @selectionNodes(opts.nodes)
+    (if @selectionNodes(opts.nodes).length == 0 then '-' else '') + @constructor.pluginName
 
   deactivate: () ->
     null

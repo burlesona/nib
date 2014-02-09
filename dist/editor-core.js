@@ -173,37 +173,29 @@ root.Editor = (function(_super) {
     this.node = opts.node;
     this.originalClass = this.node.className;
     this.originalContent = this.node.innerHTML;
+    this.plugins = {};
     Editor.__super__.constructor.call(this, opts);
   }
 
   Editor.prototype.activate = function() {
-    var name;
+    var name, _i, _len, _ref;
     this.node.setAttribute('contenteditable', true);
-    if (this.opts.plugins != null) {
-      this.plugins = (function() {
-        var _i, _len, _ref, _results;
-        _ref = this.opts.plugins;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          name = _ref[_i];
-          _results.push(new Editor.pluginsRegistry[name](this));
-        }
-        return _results;
-      }).call(this);
+    _ref = this.opts.plugins || [];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      name = _ref[_i];
+      this.plugins[name] = new Editor.pluginsRegistry[name](this);
     }
     this.initDOMEvents();
     return this.trigger('editor:on');
   };
 
   Editor.prototype.deactivate = function() {
-    var plugin, _i, _len, _ref;
+    var name, plug, _ref;
     this.node.setAttribute('contenteditable', false);
-    if (this.plugins) {
-      _ref = this.plugins;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        plugin = _ref[_i];
-        plugin.deactivate();
-      }
+    _ref = this.plugins;
+    for (name in _ref) {
+      plug = _ref[name];
+      plug.deactivate();
     }
     this.deactivateDOMEvents();
     this.trigger('editor:off');
@@ -285,14 +277,37 @@ root.Editor = (function(_super) {
   };
 
   Editor.prototype.checkSelection = function() {
-    var nodes, range, selection;
-    nodes = this.getSelectedNodes();
+    var name, opts, plug, range, selection, state, _i, _len, _ref;
     selection = this.getSelection();
     if (selection.rangeCount) {
       range = selection.getRangeAt(0);
     }
-    this.trigger('selection:change', selection, range, nodes, selection.toHtml());
-    return this.detach(selection, range);
+    opts = {
+      selection: selection,
+      range: range,
+      nodes: this.getSelectedNodes(),
+      onStates: [],
+      offStates: []
+    };
+    _ref = (function() {
+      var _ref, _results;
+      _ref = this.plugins;
+      _results = [];
+      for (name in _ref) {
+        plug = _ref[name];
+        _results.push(plug.checkSelection(this, opts));
+      }
+      return _results;
+    }).call(this);
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      state = _ref[_i];
+      if (state.match(/^-/)) {
+        opts.offStates.push(state.slice(1));
+      } else {
+        opts.onStates.push(state);
+      }
+    }
+    return this.trigger('report', opts);
   };
 
   Editor.prototype.detach = function() {
