@@ -105,7 +105,7 @@ class root.Editor extends Events
         opts.onStates.push(state)
 
     @trigger('report', opts)
-    # @detach(selection, range)
+    @detach(range)
 
   detach: (args...) ->
     rangyEl.detach() for rangyEl in args when rangyEl
