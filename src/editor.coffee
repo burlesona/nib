@@ -14,17 +14,19 @@ class root.Editor extends Events
     @node = opts.node
     @originalClass = @node.className
     @originalContent = @node.innerHTML
+    @plugins = {}
     super(opts)
 
   activate: () ->
     @node.setAttribute 'contenteditable', true
-    @plugins = (new Editor.pluginsRegistry[name](@) for name in @opts.plugins) if @opts.plugins?
+    for name in (@opts.plugins or [])
+      @plugins[name] = new Editor.pluginsRegistry[name](@)
     @initDOMEvents()
     @trigger('editor:on')
 
   deactivate: () ->
     @node.setAttribute 'contenteditable', false
-    plugin.deactivate() for plugin in @plugins if @plugins
+    plug.deactivate() for name, plug of @plugins
     @deactivateDOMEvents()
     @trigger('editor:off')
     @clear()
@@ -87,12 +89,20 @@ class root.Editor extends Events
     nodes
 
   checkSelection: () ->
-    nodes = @getSelectedNodes()
     selection = @getSelection()
     range = selection.getRangeAt(0) if selection.rangeCount
+    opts =
+      selection: selection
+      range: range
+      nodes: @getSelectedNodes()
+      states: []
 
-    @trigger('selection:change', selection, range, nodes, selection.toHtml())
-    @detach(selection, range)
+    for name, plug of @plugins
+      state = plug.checkSelection(@, opts)
+      opts.states.push(state) if state
+
+    @trigger('report', opts)
+    @detach(range)
 
   detach: (args...) ->
     rangyEl.detach() for rangyEl in args when rangyEl
@@ -136,24 +146,17 @@ class root.Editor extends Events
 
   wrapped: (tagName) ->
     nodes = @getSelectedNodes()
-
     @lookForTag(tagName, nodes)
 
   unwrap: (tagName) ->
     nodes = @getSelectedNodes()
     tags = @lookForTags(tagName, nodes)
-
     savedSelection = @saveSelection()
-
     for node in tags
       while (childNode = node.firstChild)
-        # Here we must not delete & recreate nodes,
-        # we just move them. The selection can't be
-        # restored when the nodes gets deleted.
+        # Here we must not delete & recreate nodes, we just move them. The
+        # selection can't be restored when the nodes gets deleted.
         node.parentNode.insertBefore(childNode, node)
-
       node.remove()
-
     @restoreSelection(savedSelection)
-
     @checkSelection()

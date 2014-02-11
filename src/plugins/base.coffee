@@ -10,26 +10,22 @@ class root.BasePlugin
       Editor::[name] = method
 
   constructor: (editor) ->
-    @validNodes = []
     @editor = editor
     @initEvents()
 
-  initEvents: ->
-    @editor.on 'selection:change', (editor, selection, range, nodes, htmlContent) =>
-      @checkSelection(editor, selection, range, nodes, htmlContent)
+  initEvents: -> undefined
 
   validNode: (node) ->
     node.nodeName.toLowerCase() in @validNodes
 
-  checkSelection: (editor, selection, range, nodes, htmlContent) ->
-    nodes = Utils.domNodes(nodes).filter @validNode.bind(@)
-    if nodes.length > 0
-      editor.trigger("report:#{@constructor.pluginName}:on", nodes)
-    else
-      editor.trigger("report:#{@constructor.pluginName}:off")
+  selectionNodes: (nodes = []) ->
+    Utils.domNodes(nodes).filter @validNode.bind(@)
 
-  deactivate: () ->
-    null
+  checkSelection: (editor, opts = {}) ->
+    nodes = @selectionNodes(opts.nodes)
+    @constructor.pluginName if @selectionNodes(opts.nodes).length > 0
+
+  deactivate: () -> undefined
 
 
 class root.MetaKeyAction extends BasePlugin
@@ -38,7 +34,7 @@ class root.MetaKeyAction extends BasePlugin
 
   initEvents: ->
     super()
-    @editor.on 'keydown', (editor, event) =>
+    @editor.on 'keydown', (event, editor) =>
       if (event.ctrlKey or event.metaKey) and event.which == @key
         event.preventDefault()
         editor[@method]()

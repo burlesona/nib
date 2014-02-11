@@ -41,18 +41,18 @@ toolbarDialog = new root.ToolbarDialogs(
   document.getElementById('dialogs')
 )
 
-setOnOffHandlers = (editor, name, el) ->
-  editor.on "report:#{name}:on", (editor) ->
-    el.style.fontWeight = 'bold'
-
-  editor.on "report:#{name}:off", (editor) ->
-    el.style.fontWeight = 'normal'
+setOnOffHandlers = (editor, names) ->
+  editor.on 'report', (opts, editor) ->
+    for state in opts.states
+      el = document.getElementById(state)
+      el.style.fontWeight = 'bold'
+    for name in names
+      if name not in opts.states
+        el = document.getElementById(state)
+        el.style.fontWeight = 'normal'
 
 setHandlers = (editor, name) ->
   link = document.getElementById(name)
-
-  setOnOffHandlers(editor, name, link)
-
   link.addEventListener 'click', (event) ->
     event.preventDefault()
     editor[link.dataset.method]()
@@ -60,53 +60,42 @@ setHandlers = (editor, name) ->
 
 createLinkHandlers = (editor) ->
   link = document.getElementById('link')
-  setOnOffHandlers(editor, 'link', link)
   link.addEventListener 'click', (event) ->
     event.preventDefault()
     editor.createLink(prompt('URL:'))
     false
 
   link2 = document.getElementById('link2')
-  setOnOffHandlers(editor, 'link2', link2)
-
   link2.addEventListener 'click', (event) ->
     event.preventDefault()
-
     toolbarDialog.showLinkDialog('http://', true)
-
     false
 
   linkDialog = toolbarDialog.linkDialog
-
   linkDialog.getElement('.save').addEventListener 'click', (event) ->
     event.preventDefault()
-
     url = linkDialog.getElement('.content').value
     editor.createLink2(url)
     linkDialog.hide()
-
     false
 
   linkDialog.getElement('.remove').addEventListener 'click', (event) ->
     event.preventDefault()
-
     editor.removeLink2()
-
     false
 
-  editor.on "report:link2:on", (editor, nodes) ->
-    if nodes.length == 1
-      node = nodes[0]
+  editor.on 'report', (opts, editor) ->
+    if 'link2' in opts.states
+      node = editor.plugins.link2.selectionNodes(opts.nodes)[0]
       toolbarDialog.showLinkDialog(node.href)
-
-  editor.on "report:link2:off", (editor, nodes) ->
-    linkDialog.hide()
-    linkDialog.getElement('.content').value = ''
+    else
+      linkDialog.hide()
+      linkDialog.getElement('.content').value = ''
 
 root.initToolbar = (editor) ->
-  setHandlers(editor, name) for name in [
-    'bold', 'italic', 'underline', 'strikethrough',
-    'subscript', 'superscript', 'outdent', 'indent',
-    'bold2',
-  ]
+  names = ['bold', 'italic', 'underline', 'strikethrough',
+           'subscript', 'superscript', 'outdent', 'indent',
+           'bold2']
+  setHandlers(editor, name) for name in names
+  setOnOffHandlers(editor, names)
   createLinkHandlers(editor)
