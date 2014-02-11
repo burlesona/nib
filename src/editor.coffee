@@ -1,7 +1,4 @@
-# Global Scope
-root = exports ? this
-
-class root.Editor extends Events
+class Nib.Editor extends Nib.Events
   @pluginsRegistry: {}
 
   @register: (plugins...) ->
@@ -82,7 +79,7 @@ class root.Editor extends Events
           nodes = [range.startContainer || range.endContainer]
       else
         nodes = range.getNodes()
-      nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, nodes)))
+      nodes = Nib.Utils.uniqueNodes(Nib.Utils.flatten(Nib.Utils.parentNodes(@node, nodes)))
       range.detach()
 
     selection.detach()
@@ -108,7 +105,7 @@ class root.Editor extends Events
     rangyEl.detach() for rangyEl in args when rangyEl
 
   saveSelection: () ->
-    new SelectionHandler()
+    new Nib.SelectionHandler()
 
   restoreSelection: (selection) ->
     selection.restoreSelection()

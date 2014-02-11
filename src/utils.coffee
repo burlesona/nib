@@ -1,8 +1,4 @@
-# Global Scope
-root = exports ? this
-
-
-class root.Utils
+class Nib.Utils
   @parentNodes: (stopNode, node) ->
     if node instanceof Array
       (@parentNodes(stopNode, n) for n in node)

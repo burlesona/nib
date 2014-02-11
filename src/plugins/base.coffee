@@ -1,7 +1,4 @@
-# Global Scope
-root = exports ? this
-
-class root.BasePlugin
+class Nib.BasePlugin
   @pluginName: ''
   @editorMethods: {}
 
@@ -19,7 +16,7 @@ class root.BasePlugin
     node.nodeName.toLowerCase() in @validNodes
 
   selectionNodes: (nodes = []) ->
-    Utils.domNodes(nodes).filter @validNode.bind(@)
+    Nib.Utils.domNodes(nodes).filter @validNode.bind(@)
 
   checkSelection: (editor, opts = {}) ->
     nodes = @selectionNodes(opts.nodes)
@@ -28,7 +25,7 @@ class root.BasePlugin
   deactivate: () -> undefined
 
 
-class root.MetaKeyAction extends BasePlugin
+class Nib.MetaKeyAction extends Nib.BasePlugin
   key: null
   method: ''
 

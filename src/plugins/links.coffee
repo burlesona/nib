@@ -1,13 +1,10 @@
-# Global Scope
-root = exports ? this
-
-class root.Link extends BasePlugin
+class Nib.Link extends Nib.BasePlugin
   @pluginName: 'link'
   @editorMethods:
     createLink: (url) -> @exec('createLink', url)
   validNodes: ['a']
 
-class root.Link2 extends BasePlugin
+class Nib.Link2 extends Nib.BasePlugin
   @pluginName: 'link2'
   @editorMethods:
     removeLink2: () ->
@@ -22,4 +19,4 @@ class root.Link2 extends BasePlugin
 
   validNodes: ['a']
 
-Editor.register(Link, Link2)
+Nib.Editor.register(Nib.Link, Nib.Link2)
