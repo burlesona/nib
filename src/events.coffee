@@ -18,7 +18,7 @@ class root.Events
 
   trigger: (name, args...) ->
     return unless @handlers[name]
-    fn(this, args...) for fn in @handlers[name]
+    fn(args..., this) for fn in @handlers[name]
     this
 
   clear: () ->

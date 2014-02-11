@@ -13,7 +13,7 @@ class root.BasePlugin
     @editor = editor
     @initEvents()
 
-  initEvents: ->
+  initEvents: -> undefined
 
   validNode: (node) ->
     node.nodeName.toLowerCase() in @validNodes
@@ -25,8 +25,7 @@ class root.BasePlugin
     nodes = @selectionNodes(opts.nodes)
     (if @selectionNodes(opts.nodes).length == 0 then '-' else '') + @constructor.pluginName
 
-  deactivate: () ->
-    null
+  deactivate: () -> undefined
 
 
 class root.MetaKeyAction extends BasePlugin
@@ -35,7 +34,7 @@ class root.MetaKeyAction extends BasePlugin
 
   initEvents: ->
     super()
-    @editor.on 'keydown', (editor, event) =>
+    @editor.on 'keydown', (event, editor) =>
       if (event.ctrlKey or event.metaKey) and event.which == @key
         event.preventDefault()
         editor[@method]()

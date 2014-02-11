@@ -28,10 +28,13 @@ root.Events = (function() {
   Events.prototype.trigger = function() {
     var args, fn, name, _i, _len, _ref;
     name = arguments[0], args = 2 <= arguments.length ? __slice.call(arguments, 1) : [];
-    _ref = this.handlers[name] || [];
+    if (!this.handlers[name]) {
+      return;
+    }
+    _ref = this.handlers[name];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       fn = _ref[_i];
-      fn.apply(null, [this].concat(__slice.call(args)));
+      fn.apply(null, __slice.call(args).concat([this]));
     }
     return this;
   };
@@ -307,7 +310,8 @@ root.Editor = (function(_super) {
         opts.onStates.push(state);
       }
     }
-    return this.trigger('report', opts);
+    this.trigger('report', opts);
+    return this.detach(range);
   };
 
   Editor.prototype.detach = function() {

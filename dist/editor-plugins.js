@@ -26,7 +26,9 @@ root.BasePlugin = (function() {
     this.initEvents();
   }
 
-  BasePlugin.prototype.initEvents = function() {};
+  BasePlugin.prototype.initEvents = function() {
+    return void 0;
+  };
 
   BasePlugin.prototype.validNode = function(node) {
     var _ref;
@@ -50,7 +52,7 @@ root.BasePlugin = (function() {
   };
 
   BasePlugin.prototype.deactivate = function() {
-    return null;
+    return void 0;
   };
 
   return BasePlugin;
@@ -72,7 +74,7 @@ root.MetaKeyAction = (function(_super) {
   MetaKeyAction.prototype.initEvents = function() {
     var _this = this;
     MetaKeyAction.__super__.initEvents.call(this);
-    return this.editor.on('keydown', function(editor, event) {
+    return this.editor.on('keydown', function(event, editor) {
       if ((event.ctrlKey || event.metaKey) && event.which === _this.key) {
         event.preventDefault();
         return editor[_this.method]();

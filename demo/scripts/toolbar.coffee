@@ -42,7 +42,7 @@ toolbarDialog = new root.ToolbarDialogs(
 )
 
 setOnOffHandlers = (editor) ->
-  editor.on 'report', (editor, opts = {}) ->
+  editor.on 'report', (opts, editor) ->
     for state in opts.onStates
       el = document.getElementById(state)
       el.style.fontWeight = 'bold'
@@ -83,7 +83,7 @@ createLinkHandlers = (editor) ->
     editor.removeLink2()
     false
 
-  editor.on 'report', (editor, opts = {}) ->
+  editor.on 'report', (opts, editor) ->
     if 'link2' in opts.onStates
       node = editor.plugins.link2.selectionNodes(opts.nodes)[0]
       toolbarDialog.showLinkDialog(node.href)
