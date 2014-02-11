@@ -280,7 +280,7 @@ root.Editor = (function(_super) {
   };
 
   Editor.prototype.checkSelection = function() {
-    var name, opts, plug, range, selection, state, _i, _len, _ref;
+    var name, opts, plug, range, selection, state, _ref;
     selection = this.getSelection();
     if (selection.rangeCount) {
       range = selection.getRangeAt(0);
@@ -289,25 +289,14 @@ root.Editor = (function(_super) {
       selection: selection,
       range: range,
       nodes: this.getSelectedNodes(),
-      onStates: [],
-      offStates: []
+      states: []
     };
-    _ref = (function() {
-      var _ref, _results;
-      _ref = this.plugins;
-      _results = [];
-      for (name in _ref) {
-        plug = _ref[name];
-        _results.push(plug.checkSelection(this, opts));
-      }
-      return _results;
-    }).call(this);
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      state = _ref[_i];
-      if (state.match(/^-/)) {
-        opts.offStates.push(state.slice(1));
-      } else {
-        opts.onStates.push(state);
+    _ref = this.plugins;
+    for (name in _ref) {
+      plug = _ref[name];
+      state = plug.checkSelection(this, opts);
+      if (state) {
+        opts.states.push(state);
       }
     }
     this.trigger('report', opts);

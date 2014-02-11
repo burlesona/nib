@@ -41,14 +41,15 @@ toolbarDialog = new root.ToolbarDialogs(
   document.getElementById('dialogs')
 )
 
-setOnOffHandlers = (editor) ->
+setOnOffHandlers = (editor, names) ->
   editor.on 'report', (opts, editor) ->
-    for state in opts.onStates
+    for state in opts.states
       el = document.getElementById(state)
       el.style.fontWeight = 'bold'
-    for state in opts.offStates
-      el = document.getElementById(state)
-      el.style.fontWeight = 'normal'
+    for name in names
+      if name not in opts.states
+        el = document.getElementById(state)
+        el.style.fontWeight = 'normal'
 
 setHandlers = (editor, name) ->
   link = document.getElementById(name)
@@ -84,18 +85,17 @@ createLinkHandlers = (editor) ->
     false
 
   editor.on 'report', (opts, editor) ->
-    if 'link2' in opts.onStates
+    if 'link2' in opts.states
       node = editor.plugins.link2.selectionNodes(opts.nodes)[0]
       toolbarDialog.showLinkDialog(node.href)
-    else if 'link2' in opts.offStates
+    else
       linkDialog.hide()
       linkDialog.getElement('.content').value = ''
 
 root.initToolbar = (editor) ->
-  setHandlers(editor, name) for name in [
-    'bold', 'italic', 'underline', 'strikethrough',
-    'subscript', 'superscript', 'outdent', 'indent',
-    'bold2',
-  ]
-  setOnOffHandlers(editor)
+  names = ['bold', 'italic', 'underline', 'strikethrough',
+           'subscript', 'superscript', 'outdent', 'indent',
+           'bold2']
+  setHandlers(editor, name) for name in names
+  setOnOffHandlers(editor, names)
   createLinkHandlers(editor)

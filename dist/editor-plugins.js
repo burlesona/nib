@@ -48,7 +48,9 @@ root.BasePlugin = (function() {
       opts = {};
     }
     nodes = this.selectionNodes(opts.nodes);
-    return (this.selectionNodes(opts.nodes).length === 0 ? '-' : '') + this.constructor.pluginName;
+    if (this.selectionNodes(opts.nodes).length > 0) {
+      return this.constructor.pluginName;
+    }
   };
 
   BasePlugin.prototype.deactivate = function() {

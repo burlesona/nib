@@ -95,14 +95,11 @@ class root.Editor extends Events
       selection: selection
       range: range
       nodes: @getSelectedNodes()
-      onStates: []
-      offStates: []
+      states: []
 
-    for state in (plug.checkSelection(@, opts) for name, plug of @plugins)
-      if state.match(/^-/)
-        opts.offStates.push(state.slice(1))
-      else
-        opts.onStates.push(state)
+    for name, plug of @plugins
+      state = plug.checkSelection(@, opts)
+      opts.states.push(state) if state
 
     @trigger('report', opts)
     @detach(range)

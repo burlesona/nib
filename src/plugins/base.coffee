@@ -23,7 +23,7 @@ class root.BasePlugin
 
   checkSelection: (editor, opts = {}) ->
     nodes = @selectionNodes(opts.nodes)
-    (if @selectionNodes(opts.nodes).length == 0 then '-' else '') + @constructor.pluginName
+    @constructor.pluginName if @selectionNodes(opts.nodes).length > 0
 
   deactivate: () -> undefined
 
