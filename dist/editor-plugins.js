@@ -145,10 +145,6 @@ Nib.Plugins.Link2 = (function(_super) {
 
   Link2.prototype.validNodes = ['a'];
 
-  Link2.prototype.off = function() {
-    return this.editor.unwrap('a');
-  };
-
   Link2.prototype.on = function(url) {
     var node;
     if (url.indexOf('://') === -1) {
@@ -159,11 +155,15 @@ Nib.Plugins.Link2 = (function(_super) {
     return node;
   };
 
+  Link2.prototype.off = function() {
+    return this.editor.unwrap('a');
+  };
+
   return Link2;
 
 })(Nib.Plugins.Base);
 
-var _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8,
+var _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -313,51 +313,5 @@ Nib.Plugins.Bold2 = (function(_super) {
   };
 
   return Bold2;
-
-})(Nib.Plugins.Base);
-
-Nib.Plugins.Link = (function(_super) {
-  __extends(Link, _super);
-
-  function Link() {
-    _ref7 = Link.__super__.constructor.apply(this, arguments);
-    return _ref7;
-  }
-
-  Link.prototype.validNodes = ['a'];
-
-  Link.prototype.toggle = function(url) {
-    return this.editor.exec('createLink', url);
-  };
-
-  return Link;
-
-})(Nib.Plugins.Base);
-
-Nib.Plugins.Link2 = (function(_super) {
-  __extends(Link2, _super);
-
-  function Link2() {
-    _ref8 = Link2.__super__.constructor.apply(this, arguments);
-    return _ref8;
-  }
-
-  Link2.prototype.validNodes = ['a'];
-
-  Link2.prototype.on = function(url) {
-    var node;
-    if (url.indexOf('://') === -1) {
-      url = "http://" + url;
-    }
-    node = this.editor.wrapped('a') || this.editor.wrap('a');
-    node.href = url;
-    return node;
-  };
-
-  Link2.prototype.off = function() {
-    return this.editor.unwrap('a');
-  };
-
-  return Link2;
 
 })(Nib.Plugins.Base);
