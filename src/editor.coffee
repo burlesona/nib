@@ -10,7 +10,7 @@ class Nib.Editor extends Nib.Events
   # Create a new Editor Instance
   # Requires options object be passed.
   # Requires opts.node be a dom node such as `document.getElementById('myNode')
-  # Reqiores opts.plugins to be an array of plugin names
+  # Requires opts.plugins to be an array of plugin names
   # Ex:
   # myNode = document.getElementById('mynode')
   # ed = new Nib.Editor(node: myNode, plugins:['bold'])
