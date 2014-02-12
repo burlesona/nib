@@ -1,67 +1,48 @@
-var root, _ref,
+var _, _ref,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
+_ = Nib.Utils;
 
-root.BasePlugin = (function() {
-  BasePlugin.pluginName = '';
-
-  BasePlugin.editorMethods = {};
-
-  BasePlugin.extendEditor = function(Editor) {
-    var method, name, _ref, _results;
-    _ref = this.editorMethods;
-    _results = [];
-    for (name in _ref) {
-      method = _ref[name];
-      _results.push(Editor.prototype[name] = method);
-    }
-    return _results;
-  };
-
-  function BasePlugin(editor) {
+Nib.Plugins.Base = (function() {
+  function Base(editor) {
     this.editor = editor;
     this.initEvents();
   }
 
-  BasePlugin.prototype.initEvents = function() {
+  Base.prototype.initEvents = function() {
     return void 0;
   };
 
-  BasePlugin.prototype.validNode = function(node) {
+  Base.prototype.validNode = function(node) {
     var _ref;
     return _ref = node.nodeName.toLowerCase(), __indexOf.call(this.validNodes, _ref) >= 0;
   };
 
-  BasePlugin.prototype.selectionNodes = function(nodes) {
+  Base.prototype.selectionNodes = function(nodes) {
     if (nodes == null) {
       nodes = [];
     }
-    return Utils.domNodes(nodes).filter(this.validNode.bind(this));
+    return _.domNodes(nodes).filter(this.validNode.bind(this));
   };
 
-  BasePlugin.prototype.checkSelection = function(editor, opts) {
-    var nodes;
+  Base.prototype.checkSelection = function(opts) {
     if (opts == null) {
       opts = {};
     }
-    nodes = this.selectionNodes(opts.nodes);
-    if (this.selectionNodes(opts.nodes).length > 0) {
-      return this.constructor.pluginName;
-    }
+    return this.selectionNodes(opts.nodes).length > 0;
   };
 
-  BasePlugin.prototype.deactivate = function() {
+  Base.prototype.deactivate = function() {
     return void 0;
   };
 
-  return BasePlugin;
+  return Base;
 
 })();
 
-root.MetaKeyAction = (function(_super) {
+Nib.Plugins.MetaKeyAction = (function(_super) {
   __extends(MetaKeyAction, _super);
 
   function MetaKeyAction() {
@@ -71,7 +52,7 @@ root.MetaKeyAction = (function(_super) {
 
   MetaKeyAction.prototype.key = null;
 
-  MetaKeyAction.prototype.method = '';
+  MetaKeyAction.prototype.method = 'toggle';
 
   MetaKeyAction.prototype.initEvents = function() {
     var _this = this;
@@ -86,15 +67,13 @@ root.MetaKeyAction = (function(_super) {
 
   return MetaKeyAction;
 
-})(BasePlugin);
+})(Nib.Plugins.Base);
 
-var root, _ref, _ref1,
+var _ref, _ref1,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
-root.Indent = (function(_super) {
+Nib.Plugins.Indent = (function(_super) {
   __extends(Indent, _super);
 
   function Indent() {
@@ -102,21 +81,17 @@ root.Indent = (function(_super) {
     return _ref;
   }
 
-  Indent.pluginName = 'indent';
-
-  Indent.editorMethods = {
-    indentParagraph: function() {
-      return this.exec('indent');
-    }
-  };
-
   Indent.prototype.validNodes = ['blockquote'];
+
+  Indent.prototype.toggle = function() {
+    return this.editor.exec('indent');
+  };
 
   return Indent;
 
-})(BasePlugin);
+})(Nib.Plugins.Base);
 
-root.Outdent = (function(_super) {
+Nib.Plugins.Outdent = (function(_super) {
   __extends(Outdent, _super);
 
   function Outdent() {
@@ -124,33 +99,25 @@ root.Outdent = (function(_super) {
     return _ref1;
   }
 
-  Outdent.pluginName = 'outdent';
+  Outdent.prototype.validNodes = ['blockquote'];
 
-  Outdent.editorMethods = {
-    outdentParagraph: function() {
-      var quote;
-      quote = this.node.querySelector('blockquote');
-      if (quote) {
-        return quote.outerHTML = quote.innerHTML;
-      }
+  Outdent.prototype.toggle = function() {
+    var quote;
+    quote = this.editor.node.querySelector('blockquote');
+    if (quote) {
+      return quote.outerHTML = quote.innerHTML;
     }
   };
 
-  Outdent.prototype.validNodes = ['blockquote'];
-
   return Outdent;
 
-})(BasePlugin);
+})(Nib.Plugins.Base);
 
-Editor.register(Indent, Outdent);
-
-var root, _ref, _ref1,
+var _ref, _ref1,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
-root.Link = (function(_super) {
+Nib.Plugins.Link = (function(_super) {
   __extends(Link, _super);
 
   function Link() {
@@ -158,21 +125,17 @@ root.Link = (function(_super) {
     return _ref;
   }
 
-  Link.pluginName = 'link';
-
-  Link.editorMethods = {
-    createLink: function(url) {
-      return this.exec('createLink', url);
-    }
-  };
-
   Link.prototype.validNodes = ['a'];
+
+  Link.prototype.toggle = function(url) {
+    return this.editor.exec('createLink', url);
+  };
 
   return Link;
 
-})(BasePlugin);
+})(Nib.Plugins.Base);
 
-root.Link2 = (function(_super) {
+Nib.Plugins.Link2 = (function(_super) {
   __extends(Link2, _super);
 
   function Link2() {
@@ -180,90 +143,71 @@ root.Link2 = (function(_super) {
     return _ref1;
   }
 
-  Link2.pluginName = 'link2';
+  Link2.prototype.validNodes = ['a'];
 
-  Link2.editorMethods = {
-    removeLink2: function() {
-      return this.unwrap('a');
-    },
-    createLink2: function(url) {
-      var node;
-      if (url.indexOf('://') === -1) {
-        url = "http://" + url;
-      }
-      node = this.wrapped('a') || this.wrap('a');
-      node.href = url;
-      return node;
-    }
+  Link2.prototype.off = function() {
+    return this.editor.unwrap('a');
   };
 
-  Link2.prototype.validNodes = ['a'];
+  Link2.prototype.on = function(url) {
+    var node;
+    if (url.indexOf('://') === -1) {
+      url = "http://" + url;
+    }
+    node = this.editor.wrapped('a') || this.editor.wrap('a');
+    node.href = url;
+    return node;
+  };
 
   return Link2;
 
-})(BasePlugin);
+})(Nib.Plugins.Base);
 
-Editor.register(Link, Link2);
-
-var root, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6,
+var _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
+Nib.Plugins.Bold = (function(_super) {
+  __extends(Bold, _super);
 
-root.BoldText = (function(_super) {
-  __extends(BoldText, _super);
-
-  function BoldText() {
-    _ref = BoldText.__super__.constructor.apply(this, arguments);
+  function Bold() {
+    _ref = Bold.__super__.constructor.apply(this, arguments);
     return _ref;
   }
 
-  BoldText.pluginName = 'bold';
+  Bold.prototype.key = 66;
 
-  BoldText.editorMethods = {
-    toggleBold: function() {
-      return this.exec('bold');
-    }
+  Bold.prototype.validNodes = ['b', 'strong'];
+
+  Bold.prototype.toggle = function() {
+    return this.editor.exec('bold');
   };
 
-  BoldText.prototype.key = 66;
+  return Bold;
 
-  BoldText.prototype.method = 'toggleBold';
+})(Nib.Plugins.MetaKeyAction);
 
-  BoldText.prototype.validNodes = ['b', 'strong'];
+Nib.Plugins.Italic = (function(_super) {
+  __extends(Italic, _super);
 
-  return BoldText;
-
-})(MetaKeyAction);
-
-root.ItalicText = (function(_super) {
-  __extends(ItalicText, _super);
-
-  function ItalicText() {
-    _ref1 = ItalicText.__super__.constructor.apply(this, arguments);
+  function Italic() {
+    _ref1 = Italic.__super__.constructor.apply(this, arguments);
     return _ref1;
   }
 
-  ItalicText.pluginName = 'italic';
+  Italic.prototype.key = 73;
 
-  ItalicText.editorMethods = {
-    toggleItalic: function() {
-      return this.exec('italic');
-    }
+  Italic.prototype.validNodes = ['i', 'em'];
+
+  Italic.prototype.toggle = function() {
+    return this.editor.exec('italic');
   };
 
-  ItalicText.prototype.key = 73;
+  return Italic;
 
-  ItalicText.prototype.method = 'toggleItalic';
+})(Nib.Plugins.MetaKeyAction);
 
-  ItalicText.prototype.validNodes = ['i', 'em'];
-
-  return ItalicText;
-
-})(MetaKeyAction);
-
-root.Underline = (function(_super) {
+Nib.Plugins.Underline = (function(_super) {
   __extends(Underline, _super);
 
   function Underline() {
@@ -271,47 +215,37 @@ root.Underline = (function(_super) {
     return _ref2;
   }
 
-  Underline.pluginName = 'underline';
-
-  Underline.editorMethods = {
-    toggleUnderline: function() {
-      return this.exec('underline');
-    }
-  };
-
   Underline.prototype.key = 85;
-
-  Underline.prototype.method = 'toggleUnderline';
 
   Underline.prototype.validNodes = ['u'];
 
+  Underline.prototype.toggle = function() {
+    return this.editor.exec('underline');
+  };
+
   return Underline;
 
-})(MetaKeyAction);
+})(Nib.Plugins.MetaKeyAction);
 
-root.StrikeThrough = (function(_super) {
-  __extends(StrikeThrough, _super);
+Nib.Plugins.Strikethrough = (function(_super) {
+  __extends(Strikethrough, _super);
 
-  function StrikeThrough() {
-    _ref3 = StrikeThrough.__super__.constructor.apply(this, arguments);
+  function Strikethrough() {
+    _ref3 = Strikethrough.__super__.constructor.apply(this, arguments);
     return _ref3;
   }
 
-  StrikeThrough.pluginName = 'strikethrough';
+  Strikethrough.prototype.validNodes = ['strike'];
 
-  StrikeThrough.editorMethods = {
-    toggleStrikeThrough: function() {
-      return this.exec('strikeThrough');
-    }
+  Strikethrough.prototype.toggle = function() {
+    return this.editor.exec('strikeThrough');
   };
 
-  StrikeThrough.prototype.validNodes = ['strike'];
+  return Strikethrough;
 
-  return StrikeThrough;
+})(Nib.Plugins.Base);
 
-})(BasePlugin);
-
-root.Subscript = (function(_super) {
+Nib.Plugins.Subscript = (function(_super) {
   __extends(Subscript, _super);
 
   function Subscript() {
@@ -319,21 +253,17 @@ root.Subscript = (function(_super) {
     return _ref4;
   }
 
-  Subscript.pluginName = 'subscript';
-
-  Subscript.editorMethods = {
-    toggleSubscript: function() {
-      return this.exec('subscript');
-    }
-  };
-
   Subscript.prototype.validNodes = ['sub'];
+
+  Subscript.prototype.toggle = function() {
+    return this.editor.exec('subscript');
+  };
 
   return Subscript;
 
-})(BasePlugin);
+})(Nib.Plugins.Base);
 
-root.Superscript = (function(_super) {
+Nib.Plugins.Superscript = (function(_super) {
   __extends(Superscript, _super);
 
   function Superscript() {
@@ -341,46 +271,93 @@ root.Superscript = (function(_super) {
     return _ref5;
   }
 
-  Superscript.pluginName = 'superscript';
-
-  Superscript.editorMethods = {
-    toggleSuperscript: function() {
-      return this.exec('superscript');
-    }
-  };
-
   Superscript.prototype.validNodes = ['sup'];
+
+  Superscript.prototype.toggle = function() {
+    return this.editor.exec('superscript');
+  };
 
   return Superscript;
 
-})(BasePlugin);
+})(Nib.Plugins.Base);
 
-root.BoldText2 = (function(_super) {
-  __extends(BoldText2, _super);
+Nib.Plugins.Bold2 = (function(_super) {
+  __extends(Bold2, _super);
 
-  function BoldText2() {
-    _ref6 = BoldText2.__super__.constructor.apply(this, arguments);
+  function Bold2() {
+    _ref6 = Bold2.__super__.constructor.apply(this, arguments);
     return _ref6;
   }
 
-  BoldText2.pluginName = 'bold2';
+  Bold2.prototype.validNodes = ['b', 'strong'];
 
-  BoldText2.editorMethods = {
-    toggleBold2: function() {
-      if (this.wrapped('b')) {
-        return this.unwrap('b');
-      } else if (this.wrapped('strong')) {
-        return this.unwrap('strong');
-      } else {
-        return this.wrap('b');
-      }
+  Bold2.prototype.toggle = function() {
+    if (this.editor.wrapped('b')) {
+      return this.off();
+    } else if (this.editor.wrapped('strong')) {
+      return this.off('strong');
+    } else {
+      return this.on();
     }
   };
 
-  BoldText2.prototype.validNodes = ['b', 'strong'];
+  Bold2.prototype.on = function() {
+    return this.editor.wrap('b');
+  };
 
-  return BoldText2;
+  Bold2.prototype.off = function(tag) {
+    if (tag == null) {
+      tag = 'b';
+    }
+    return this.editor.unwrap(tag);
+  };
 
-})(BasePlugin);
+  return Bold2;
 
-Editor.register(BoldText, ItalicText, Underline, StrikeThrough, Subscript, Superscript, BoldText2);
+})(Nib.Plugins.Base);
+
+Nib.Plugins.Link = (function(_super) {
+  __extends(Link, _super);
+
+  function Link() {
+    _ref7 = Link.__super__.constructor.apply(this, arguments);
+    return _ref7;
+  }
+
+  Link.prototype.validNodes = ['a'];
+
+  Link.prototype.toggle = function(url) {
+    return this.editor.exec('createLink', url);
+  };
+
+  return Link;
+
+})(Nib.Plugins.Base);
+
+Nib.Plugins.Link2 = (function(_super) {
+  __extends(Link2, _super);
+
+  function Link2() {
+    _ref8 = Link2.__super__.constructor.apply(this, arguments);
+    return _ref8;
+  }
+
+  Link2.prototype.validNodes = ['a'];
+
+  Link2.prototype.on = function(url) {
+    var node;
+    if (url.indexOf('://') === -1) {
+      url = "http://" + url;
+    }
+    node = this.editor.wrapped('a') || this.editor.wrap('a');
+    node.href = url;
+    return node;
+  };
+
+  Link2.prototype.off = function() {
+    return this.editor.unwrap('a');
+  };
+
+  return Link2;
+
+})(Nib.Plugins.Base);
