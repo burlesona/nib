@@ -1,9 +1,14 @@
-var root,
-  __slice = [].slice;
+var root;
 
 root = typeof exports !== "undefined" && exports !== null ? exports : this;
 
-root.Events = (function() {
+root.Nib = {
+  Plugins: {}
+};
+
+var __slice = [].slice;
+
+Nib.Events = (function() {
   function Events() {
     this.handlers = {};
   }
@@ -47,11 +52,7 @@ root.Events = (function() {
 
 })();
 
-var root;
-
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
-root.SelectionHandler = (function() {
+Nib.SelectionHandler = (function() {
   function SelectionHandler() {
     this.selection = rangy.getSelection();
     this.baseNode = this.selection.nativeSelection.baseNode;
@@ -85,14 +86,11 @@ root.SelectionHandler = (function() {
 
 })();
 
-var root;
-
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
-
-root.Utils = (function() {
-  function Utils() {}
-
-  Utils.parentNodes = function(stopNode, node) {
+Nib.Utils = {
+  capitalize: function(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  },
+  parentNodes: function(stopNode, node) {
     var n, parents, _i, _len, _results;
     if (node instanceof Array) {
       _results = [];
@@ -109,18 +107,16 @@ root.Utils = (function() {
       }
       return parents;
     }
-  };
-
-  Utils.flatten = function(arr) {
+  },
+  flatten: function(arr) {
     if (arr.length === 0) {
       return [];
     }
     return arr.reduce(function(lhs, rhs) {
       return lhs.concat(rhs);
     });
-  };
-
-  Utils.uniqueNodes = function(arr) {
+  },
+  uniqueNodes: function(arr) {
     var node, nodes, _i, _j, _len, _len1;
     nodes = [];
     for (_i = 0, _len = arr.length; _i < _len; _i++) {
@@ -135,70 +131,56 @@ root.Utils = (function() {
       node._visited = false;
     }
     return nodes;
-  };
-
-  Utils.domNodes = function(nodes) {
+  },
+  domNodes: function(nodes) {
     return nodes.filter(function(n) {
       return n.nodeType === 1;
     });
-  };
+  }
+};
 
-  return Utils;
-
-})();
-
-var root,
+var _,
   __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
   __slice = [].slice;
 
-root = typeof exports !== "undefined" && exports !== null ? exports : this;
+_ = Nib.Utils;
 
-root.Editor = (function(_super) {
+Nib.Editor = (function(_super) {
   __extends(Editor, _super);
 
-  Editor.pluginsRegistry = {};
-
-  Editor.register = function() {
-    var Plugin, plugins, _i, _len, _results;
-    plugins = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-    _results = [];
-    for (_i = 0, _len = plugins.length; _i < _len; _i++) {
-      Plugin = plugins[_i];
-      this.pluginsRegistry[Plugin.pluginName] = Plugin;
-      _results.push(Plugin.extendEditor(this));
-    }
-    return _results;
-  };
-
   function Editor(opts) {
-    this.opts = opts || {};
+    if (opts == null) {
+      opts = {};
+    }
+    this.opts = opts;
+    this.plugins = opts.plugins || [];
     this.node = opts.node;
     this.originalClass = this.node.className;
     this.originalContent = this.node.innerHTML;
-    this.plugins = {};
     Editor.__super__.constructor.call(this, opts);
   }
 
   Editor.prototype.activate = function() {
-    var name, _i, _len, _ref;
+    var cname, name, _i, _len, _ref;
     this.node.setAttribute('contenteditable', true);
-    _ref = this.opts.plugins || [];
+    _ref = this.plugins;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       name = _ref[_i];
-      this.plugins[name] = new Editor.pluginsRegistry[name](this);
+      cname = _.capitalize(name);
+      this[name] = new Nib.Plugins[cname](this);
     }
     this.initDOMEvents();
     return this.trigger('editor:on');
   };
 
   Editor.prototype.deactivate = function() {
-    var name, plug, _ref;
+    var name, _i, _len, _ref;
     this.node.setAttribute('contenteditable', false);
     _ref = this.plugins;
-    for (name in _ref) {
-      plug = _ref[name];
-      plug.deactivate();
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      name = _ref[_i];
+      this[name].deactivate();
     }
     this.deactivateDOMEvents();
     this.trigger('editor:off');
@@ -272,7 +254,7 @@ root.Editor = (function(_super) {
       } else {
         nodes = range.getNodes();
       }
-      nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(this.node, nodes)));
+      nodes = _.uniqueNodes(_.flatten(_.parentNodes(this.node, nodes)));
       range.detach();
     }
     selection.detach();
@@ -280,7 +262,7 @@ root.Editor = (function(_super) {
   };
 
   Editor.prototype.checkSelection = function() {
-    var name, opts, plug, range, selection, state, _ref;
+    var name, opts, range, selection, _i, _len, _ref;
     selection = this.getSelection();
     if (selection.rangeCount) {
       range = selection.getRangeAt(0);
@@ -292,11 +274,10 @@ root.Editor = (function(_super) {
       states: []
     };
     _ref = this.plugins;
-    for (name in _ref) {
-      plug = _ref[name];
-      state = plug.checkSelection(this, opts);
-      if (state) {
-        opts.states.push(state);
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      name = _ref[_i];
+      if (this[name].checkSelection(opts)) {
+        opts.states.push(name);
       }
     }
     this.trigger('report', opts);
@@ -317,7 +298,7 @@ root.Editor = (function(_super) {
   };
 
   Editor.prototype.saveSelection = function() {
-    return new SelectionHandler();
+    return new Nib.SelectionHandler();
   };
 
   Editor.prototype.restoreSelection = function(selection) {
@@ -391,4 +372,4 @@ root.Editor = (function(_super) {
 
   return Editor;
 
-})(Events);
+})(Nib.Events);

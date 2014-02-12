@@ -1,9 +1,15 @@
-# Global Scope
-root = exports ? this
+# Nib Utilities
+#
+# This Object is a namespace for utility functions
+# that are used throughout the library.
 
+Nib.Utils =
+  # Capitalize a string. Ex:
+  # capitalize("foobar") #=> "Foobar"
+  capitalize: (string) ->
+    string.charAt(0).toUpperCase() + string.slice(1)
 
-class root.Utils
-  @parentNodes: (stopNode, node) ->
+  parentNodes: (stopNode, node) ->
     if node instanceof Array
       (@parentNodes(stopNode, n) for n in node)
     else
@@ -13,11 +19,11 @@ class root.Utils
         node = node.parentNode
       parents
 
-  @flatten: (arr) ->
+  flatten: (arr) ->
     if arr.length is 0 then return []
     arr.reduce (lhs, rhs) -> lhs.concat rhs
 
-  @uniqueNodes: (arr) ->
+  uniqueNodes: (arr) ->
     nodes = []
     for node in arr
       nodes.push(node) unless node._visited
@@ -26,5 +32,5 @@ class root.Utils
       node._visited = false
     nodes
 
-  @domNodes: (nodes) ->
+  domNodes: (nodes) ->
     nodes.filter (n) -> n.nodeType == 1

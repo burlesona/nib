@@ -1,25 +1,13 @@
-# Global Scope
-root = exports ? this
-
-class root.Link extends BasePlugin
-  @pluginName: 'link'
-  @editorMethods:
-    createLink: (url) -> @exec('createLink', url)
+class Nib.Plugins.Link extends Nib.Plugins.Base
   validNodes: ['a']
+  toggle: (url) -> @editor.exec('createLink', url)
 
-class root.Link2 extends BasePlugin
-  @pluginName: 'link2'
-  @editorMethods:
-    removeLink2: () ->
-      @unwrap('a')
 
-    createLink2: (url) ->
-      url = "http://#{url}" if url.indexOf('://') is -1
-
-      node = @wrapped('a') || @wrap('a')
-      node.href = url
-      node
-
+class Nib.Plugins.Link2 extends Nib.Plugins.Base
   validNodes: ['a']
-
-Editor.register(Link, Link2)
+  on: (url) ->
+    url = "http://#{url}" if url.indexOf('://') is -1
+    node = @editor.wrapped('a') || @editor.wrap('a')
+    node.href = url
+    node
+  off: () -> @editor.unwrap('a')

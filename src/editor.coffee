@@ -1,42 +1,65 @@
-# Global Scope
-root = exports ? this
+# Nib Editor
+#
+# This is the core editor prototype. Initialize an instance
+# to control a contentEditable element.
 
-class root.Editor extends Events
-  @pluginsRegistry: {}
+# Use Nib Utilities
+_ = Nib.Utils
 
-  @register: (plugins...) ->
-    for Plugin in plugins
-      @pluginsRegistry[Plugin.pluginName] = Plugin
-      Plugin.extendEditor(@)
-
-  constructor: (opts) ->
-    @opts = opts || {}
+class Nib.Editor extends Nib.Events
+  # Create a new Editor Instance
+  # Requires options object be passed.
+  # Requires opts.node be a dom node such as `document.getElementById('myNode')
+  # Requires opts.plugins to be an array of plugin names
+  # Ex:
+  # myNode = document.getElementById('mynode')
+  # ed = new Nib.Editor(node: myNode, plugins:['bold'])
+  constructor: (opts={}) ->
+    @opts = opts
+    @plugins = opts.plugins || []
     @node = opts.node
     @originalClass = @node.className
     @originalContent = @node.innerHTML
-    @plugins = {}
     super(opts)
 
-  activate: () ->
+  # Set the given node as contenteditable
+  # Create plugin instances
+  # Create DOM event bindings
+  # Report that the editor is on
+  activate: ->
     @node.setAttribute 'contenteditable', true
-    for name in (@opts.plugins or [])
-      @plugins[name] = new Editor.pluginsRegistry[name](@)
+
+    for name in @plugins
+      cname = _.capitalize(name)
+      this[name] = new Nib.Plugins[cname](this)
+
     @initDOMEvents()
     @trigger('editor:on')
 
+  # Set the given node as not contenteditable
+  # Deactivate plugin instances
+  # Remove DOM event bindings
+  # Report the editor is off
+  # Remove all event handlers
   deactivate: () ->
     @node.setAttribute 'contenteditable', false
-    plug.deactivate() for name, plug of @plugins
+    this[name].deactivate() for name in @plugins
     @deactivateDOMEvents()
     @trigger('editor:off')
     @clear()
 
+  # Detect if the node's current content is different from the original
   hasChanged: ->
     @node.innerHTML != @originalContent
 
+  # Revert the node's content back to original
   revert: ->
     @node.innerHTML = @originalContent
 
+  # Call browser's execCommand method on a selection
+  # If arguments are given, pass them through to execCommand,
+  # in this case the first argument must be a selection.
+  # Otherwise, run the command against the current selection.
   exec: (command, args...) ->
     if args.length > 0
       document.execCommand(command, false, args...)
@@ -44,34 +67,42 @@ class root.Editor extends Events
       document.execCommand(command, false, @getSelection())
     @checkSelection()
 
+  # Bind DOM Event Listeners
   initDOMEvents: ->
     @node.addEventListener 'keydown', @onKeydown.bind(@)
     @node.addEventListener 'keyup', @onKeyup.bind(@)
     @node.addEventListener 'mousedown', @onMousedown.bind(@)
     @node.addEventListener 'mouseup', @onMouseup.bind(@)
 
+  # Unbind DOM Event Listeners
   deactivateDOMEvents: ->
     @node.removeEventListener 'keydown', @onKeydown
     @node.removeEventListener 'keyup', @onKeyup
     @node.removeEventListener 'mousedown', @onMousedown
     @node.removeEventListener 'mouseup', @onMouseup
 
+  # Trigger check selection and report keydown
   onKeydown: (event) ->
     @checkSelection()
     @trigger('keydown', event)
 
+  # Check selection on keyup
   onKeyup: (event) ->
     @checkSelection()
 
+  # Check selection on mouse down
   onMousedown: (event) ->
     @checkSelection()
 
+  # Check selection on mouse up
   onMouseup: (event) ->
     @checkSelection()
 
+  # Use rangy to get the current selection
   getSelection: ->
     rangy.getSelection()
 
+  # Get the current selected nodes
   getSelectedNodes: () ->
     selection = @getSelection()
     nodes = []
@@ -82,12 +113,13 @@ class root.Editor extends Events
           nodes = [range.startContainer || range.endContainer]
       else
         nodes = range.getNodes()
-      nodes = Utils.uniqueNodes(Utils.flatten(Utils.parentNodes(@node, nodes)))
+      nodes = _.uniqueNodes(_.flatten(_.parentNodes(@node, nodes)))
       range.detach()
 
     selection.detach()
     nodes
 
+  # Report the state of the current selection
   checkSelection: () ->
     selection = @getSelection()
     range = selection.getRangeAt(0) if selection.rangeCount
@@ -97,19 +129,21 @@ class root.Editor extends Events
       nodes: @getSelectedNodes()
       states: []
 
-    for name, plug of @plugins
-      state = plug.checkSelection(@, opts)
-      opts.states.push(state) if state
+    for name in @plugins
+      opts.states.push(name) if this[name].checkSelection(opts)
 
     @trigger('report', opts)
     @detach(range)
 
+
   detach: (args...) ->
     rangyEl.detach() for rangyEl in args when rangyEl
 
+  # Make a copy of the selection so we can restore it after transformation
   saveSelection: () ->
-    new SelectionHandler()
+    new Nib.SelectionHandler()
 
+  # Restore the selection after a transformation
   restoreSelection: (selection) ->
     selection.restoreSelection()
     @checkSelection()

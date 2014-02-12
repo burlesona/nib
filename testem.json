@@ -5,21 +5,23 @@
   "src_files": [
     "test/lib/chai.js",
     "test/lib/rangy-core.js",
+    "src/namespace.coffee",
     "src/events.coffee",
     "src/selection_handler.coffee",
-    "src/editor.coffee",
     "src/utils.coffee",
     "src/plugins/*.coffee",
+    "src/editor.coffee",
     "test/*.coffee"
   ],
   "serve_files": [
     "test/lib/chai.js",
     "test/lib/rangy-core.js",
+    "test/compiled/src/namespace.js",
     "test/compiled/src/events.js",
     "test/compiled/src/utils.js",
     "test/compiled/src/selection_handler.js",
-    "test/compiled/src/editor.js",
     "test/compiled/src/plugins/*.js",
+    "test/compiled/src/editor.js",
     "test/compiled/*.js"
   ],
   "on_exit": "rm -rf test/compiled"

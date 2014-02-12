@@ -1,62 +1,38 @@
-# Global Scope
-root = exports ? this
-
-
-class root.BoldText extends MetaKeyAction
-  @pluginName: 'bold'
-  @editorMethods: toggleBold: -> @exec('bold')
+class Nib.Plugins.Bold extends Nib.Plugins.MetaKeyAction
   key: 66  # key: b
-  method: 'toggleBold'
   validNodes: ['b', 'strong']
+  toggle: -> @editor.exec('bold')
 
-
-class root.ItalicText extends MetaKeyAction
-  @pluginName: 'italic'
-  @editorMethods: toggleItalic: -> @exec('italic')
+class Nib.Plugins.Italic extends Nib.Plugins.MetaKeyAction
   key: 73  # key: i
-  method: 'toggleItalic'
   validNodes: ['i', 'em']
+  toggle: -> @editor.exec('italic')
 
-
-class root.Underline extends MetaKeyAction
-  @pluginName: 'underline'
-  @editorMethods: toggleUnderline: -> @exec('underline')
+class Nib.Plugins.Underline extends Nib.Plugins.MetaKeyAction
   key: 85  # key: u
-  method: 'toggleUnderline'
   validNodes: ['u']
+  toggle: -> @editor.exec('underline')
 
-
-class root.StrikeThrough extends BasePlugin
-  @pluginName: 'strikethrough'
-  @editorMethods: toggleStrikeThrough: -> @exec('strikeThrough')
+class Nib.Plugins.Strikethrough extends Nib.Plugins.Base
   validNodes: ['strike']
+  toggle: -> @editor.exec('strikeThrough')
 
-
-class root.Subscript extends BasePlugin
-  @pluginName: 'subscript'
-  @editorMethods: toggleSubscript: -> @exec('subscript')
+class Nib.Plugins.Subscript extends Nib.Plugins.Base
   validNodes: ['sub']
+  toggle: -> @editor.exec('subscript')
 
-
-class root.Superscript extends BasePlugin
-  @pluginName: 'superscript'
-  @editorMethods: toggleSuperscript: -> @exec('superscript')
+class Nib.Plugins.Superscript extends Nib.Plugins.Base
   validNodes: ['sup']
+  toggle: -> @editor.exec('superscript')
 
-
-class root.BoldText2 extends BasePlugin
-  @pluginName: 'bold2'
-  @editorMethods:
-    toggleBold2: ->
-      if @wrapped('b')
-        @unwrap('b')
-      else if @wrapped('strong')
-        @unwrap('strong')
-      else
-        @wrap('b')
+class Nib.Plugins.Bold2 extends Nib.Plugins.Base
   validNodes: ['b', 'strong']
-
-
-Editor.register(BoldText, ItalicText, Underline,
-                StrikeThrough, Subscript, Superscript,
-                BoldText2)
+  toggle: ->
+    if @editor.wrapped('b')
+      @off()
+    else if @editor.wrapped('strong')
+      @off('strong')
+    else
+      @on()
+  on: -> @editor.wrap('b')
+  off: (tag='b') -> @editor.unwrap(tag)

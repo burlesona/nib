@@ -1,21 +1,9 @@
-# Global Scope
-root = exports ? this
-
-
-class root.Indent extends BasePlugin
-  @pluginName: 'indent'
-  @editorMethods:
-    indentParagraph: -> @exec('indent')
+class Nib.Plugins.Indent extends Nib.Plugins.Base
   validNodes: ['blockquote']
+  toggle: -> @editor.exec('indent')
 
-
-class root.Outdent extends BasePlugin
-  @pluginName: 'outdent'
-  @editorMethods:
-    outdentParagraph: ->
-      quote = @node.querySelector 'blockquote'
-      quote.outerHTML = quote.innerHTML if quote
+class Nib.Plugins.Outdent extends Nib.Plugins.Base
   validNodes: ['blockquote']
-
-
-Editor.register(Indent, Outdent)
+  toggle: ->
+    quote = @editor.node.querySelector 'blockquote'
+    quote.outerHTML = quote.innerHTML if quote

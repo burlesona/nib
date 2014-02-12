@@ -1,8 +1,6 @@
-root = exports ? this
-
 # This class helps on keeping the selection when changing
 # selected nodes
-class root.SelectionHandler
+class Nib.SelectionHandler
   constructor: () ->
     @selection = rangy.getSelection()
 

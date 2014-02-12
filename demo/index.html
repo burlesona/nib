@@ -6,18 +6,18 @@
   </head>
   <body>
     <div id="toolbar">
-      <a href="#" id="bold" data-method="toggleBold">Bold</a>
-      <a href="#" id="italic" data-method="toggleItalic">Italic</a>
-      <a href="#" id="underline" data-method="toggleUnderline">Underline</a>
-      <a href="#" id="strikethrough" data-method="toggleStrikeThrough">StrikeThrough</a>
-      <a href="#" id="subscript" data-method="toggleSubscript">Subscript</a>
-      <a href="#" id="superscript" data-method="toggleSuperscript">Superscript</a>
+      <a href="#" id="bold">Bold</a>
+      <a href="#" id="italic">Italic</a>
+      <a href="#" id="underline">Underline</a>
+      <a href="#" id="strikethrough">StrikeThrough</a>
+      <a href="#" id="subscript">Subscript</a>
+      <a href="#" id="superscript">Superscript</a>
+      <a href="#" id="outdent">Outdent</a>
+      <a href="#" id="indent">Indent</a>
       <a href="#" id="link">Link</a>
-      <a href="#" id="outdent" data-method="outdentParagraph">Outdent</a>
-      <a href="#" id="indent" data-method="indentParagraph">Indent</a>
       -
-      <a href="#" id="bold2" data-method="toggleBold2">Bold(2)</a>
-      <a href="#" id="link2" data-method="createLink2">Link2</a>
+      <a href="#" id="link2">Link2</a>
+      <a href="#" id="bold2">Bold2</a>
     </div>
 
     <iframe id="dialogs" height="26" border="0" seamless="seamless" srcdoc='
@@ -45,19 +45,20 @@
     '>
     </iframe>
     <div id="content">
-      <p id="testblock" class="block">To start experimenting, create a new 
+      <p id="testblock" class="block">To start experimenting, create a new
         editor instance and pass this node to its constructor.</p>
     </div>
 
     <script src="http://rangy.googlecode.com/svn/trunk/currentrelease/rangy-core.js"></script>
-    <script src="compiled/utils.js"></script>
+    <script src="compiled/namespace.js"></script>
     <script src="compiled/events.js"></script>
+    <script src="compiled/utils.js"></script>
     <script src="compiled/selection_handler.js"></script>
-    <script src="compiled/editor.js"></script>
     <script src="compiled/plugins/base.js"></script>
     <script src="compiled/plugins/text.js"></script>
     <script src="compiled/plugins/links.js"></script>
     <script src="compiled/plugins/indent.js"></script>
+    <script src="compiled/editor.js"></script>
     <script src="compiled/toolbar.js"></script>
     <script src="compiled/application.js"></script>
   </body>
