@@ -13,7 +13,7 @@ class Nib.Plugins.Underline extends Nib.Plugins.MetaKeyAction
   validNodes: ['u']
   toggle: -> @editor.exec('underline')
 
-class Nib.Plugins.StrikeThrough extends Nib.Plugins.Base
+class Nib.Plugins.Strikethrough extends Nib.Plugins.Base
   validNodes: ['strike']
   toggle: -> @editor.exec('strikeThrough')
 

@@ -6,7 +6,7 @@
 root = exports ? this
 
 el = document.getElementById 'testblock'
-root.ed = new Editor
+root.ed = new Nib.Editor
   node: el,
   plugins: ['bold', 'italic', 'underline', 'strikethrough',
             'subscript', 'superscript', 'link', 'outdent',
