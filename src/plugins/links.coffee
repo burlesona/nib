@@ -1,22 +1,14 @@
-class Nib.Link extends Nib.BasePlugin
-  @pluginName: 'link'
-  @editorMethods:
-    createLink: (url) -> @exec('createLink', url)
+class Nib.Plugins.Link extends Nib.Plugins.Base
   validNodes: ['a']
+  toggle: (url) -> @editor.exec('createLink', url)
 
-class Nib.Link2 extends Nib.BasePlugin
-  @pluginName: 'link2'
-  @editorMethods:
-    removeLink2: () ->
-      @unwrap('a')
-
-    createLink2: (url) ->
-      url = "http://#{url}" if url.indexOf('://') is -1
-
-      node = @wrapped('a') || @wrap('a')
-      node.href = url
-      node
-
+class Nib.Plugins.Link2 extends Nib.Plugins.Base
   validNodes: ['a']
+  off: () ->
+    @editor.unwrap('a')
+  on: (url) ->
+    url = "http://#{url}" if url.indexOf('://') is -1
 
-Nib.Editor.register(Nib.Link, Nib.Link2)
+    node = @editor.wrapped('a') || @editor.wrap('a')
+    node.href = url
+    node

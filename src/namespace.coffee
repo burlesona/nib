@@ -3,7 +3,8 @@
 # This file's purpose is simply to define the nib Namespace
 # and serve as a reference to the required load order for nib project files.
 root = exports ? this
-root.Nib = {}
+root.Nib =
+  Plugins: {}
 
 # Reqired Load Order:
 # 1. Namespace

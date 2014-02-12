@@ -1,58 +1,51 @@
-class Nib.BoldText extends Nib.MetaKeyAction
-  @pluginName: 'bold'
-  @editorMethods: toggleBold: -> @exec('bold')
+class Nib.Plugins.Bold extends Nib.Plugins.MetaKeyAction
   key: 66  # key: b
-  method: 'toggleBold'
   validNodes: ['b', 'strong']
+  toggle: -> @editor.exec('bold')
 
-
-class Nib.ItalicText extends Nib.MetaKeyAction
-  @pluginName: 'italic'
-  @editorMethods: toggleItalic: -> @exec('italic')
+class Nib.Plugins.Italic extends Nib.Plugins.MetaKeyAction
   key: 73  # key: i
-  method: 'toggleItalic'
   validNodes: ['i', 'em']
+  toggle: -> @editor.exec('italic')
 
-
-class Nib.Underline extends Nib.MetaKeyAction
-  @pluginName: 'underline'
-  @editorMethods: toggleUnderline: -> @exec('underline')
+class Nib.Plugins.Underline extends Nib.Plugins.MetaKeyAction
   key: 85  # key: u
-  method: 'toggleUnderline'
   validNodes: ['u']
+  toggle: -> @editor.exec('underline')
 
-
-class Nib.StrikeThrough extends Nib.BasePlugin
-  @pluginName: 'strikethrough'
-  @editorMethods: toggleStrikeThrough: -> @exec('strikeThrough')
+class Nib.Plugins.StrikeThrough extends Nib.Plugins.Base
   validNodes: ['strike']
+  toggle: -> @editor.exec('strikeThrough')
 
-
-class Nib.Subscript extends Nib.BasePlugin
-  @pluginName: 'subscript'
-  @editorMethods: toggleSubscript: -> @exec('subscript')
+class Nib.Plugins.Subscript extends Nib.Plugins.Base
   validNodes: ['sub']
+  toggle: -> @editor.exec('subscript')
 
-
-class Nib.Superscript extends Nib.BasePlugin
-  @pluginName: 'superscript'
-  @editorMethods: toggleSuperscript: -> @exec('superscript')
+class Nib.Plugins.Superscript extends Nib.Plugins.Base
   validNodes: ['sup']
+  toggle: -> @editor.exec('superscript')
 
-
-class Nib.BoldText2 extends Nib.BasePlugin
-  @pluginName: 'bold2'
-  @editorMethods:
-    toggleBold2: ->
-      if @wrapped('b')
-        @unwrap('b')
-      else if @wrapped('strong')
-        @unwrap('strong')
-      else
-        @wrap('b')
+class Nib.Plugins.Bold2 extends Nib.Plugins.Base
   validNodes: ['b', 'strong']
+  toggle: ->
+    if @editor.wrapped('b')
+      @off()
+    else if @editor.wrapped('strong')
+      @off('strong')
+    else
+      @on()
+  on: -> @editor.wrap('b')
+  off: (tag='b') -> @editor.unwrap(tag)
 
+class Nib.Plugins.Link extends Nib.Plugins.Base
+  validNodes: ['a']
+  toggle: (url) -> @editor.exec('createLink', url)
 
-Nib.Editor.register(Nib.BoldText, Nib.ItalicText, Nib.Underline,
-                Nib.StrikeThrough, Nib.Subscript, Nib.Superscript,
-                Nib.BoldText2)
+class Nib.Plugins.Link2 extends Nib.Plugins.Base
+  validNodes: ['a']
+  on: (url) ->
+    url = "http://#{url}" if url.indexOf('://') is -1
+    node = @editor.wrapped('a') || @editor.wrap('a')
+    node.href = url
+    node
+  off: -> @editor.unwrap('a')

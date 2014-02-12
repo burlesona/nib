@@ -1,5 +1,15 @@
-class Nib.Utils
-  @parentNodes: (stopNode, node) ->
+# Nib Utilities
+#
+# This Object is a namespace for utility functions
+# that are used throughout the library.
+
+Nib.Utils =
+  # Capitalize a string. Ex:
+  # capitalize("foobar") #=> "Foobar"
+  capitalize: (string) ->
+    string.charAt(0).toUpperCase() + string.slice(1)
+
+  parentNodes: (stopNode, node) ->
     if node instanceof Array
       (@parentNodes(stopNode, n) for n in node)
     else
@@ -9,11 +19,11 @@ class Nib.Utils
         node = node.parentNode
       parents
 
-  @flatten: (arr) ->
+  flatten: (arr) ->
     if arr.length is 0 then return []
     arr.reduce (lhs, rhs) -> lhs.concat rhs
 
-  @uniqueNodes: (arr) ->
+  uniqueNodes: (arr) ->
     nodes = []
     for node in arr
       nodes.push(node) unless node._visited
@@ -22,5 +32,5 @@ class Nib.Utils
       node._visited = false
     nodes
 
-  @domNodes: (nodes) ->
+  domNodes: (nodes) ->
     nodes.filter (n) -> n.nodeType == 1

@@ -1,17 +1,9 @@
-class Nib.Indent extends Nib.BasePlugin
-  @pluginName: 'indent'
-  @editorMethods:
-    indentParagraph: -> @exec('indent')
+class Nib.Plugins.Indent extends Nib.Plugins.Base
   validNodes: ['blockquote']
+  indentParagraph: -> @exec('indent')
 
-
-class Nib.Outdent extends Nib.BasePlugin
-  @pluginName: 'outdent'
-  @editorMethods:
-    outdentParagraph: ->
-      quote = @node.querySelector 'blockquote'
-      quote.outerHTML = quote.innerHTML if quote
+class Nib.Plugins.Outdent extends Nib.Plugins.Base
   validNodes: ['blockquote']
-
-
-Nib.Editor.register(Nib.Indent, Nib.Outdent)
+  outdentParagraph: ->
+    quote = @node.querySelector 'blockquote'
+    quote.outerHTML = quote.innerHTML if quote
