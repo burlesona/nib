@@ -1,7 +1,7 @@
 {
   "framework": "mocha",
   "launch_in_dev": ["Chrome"],
-  "before_tests": "coffee -bco test/compiled/src/ src/ && coffee -co test/compiled/ test/*.coffee",
+  "before_tests": "coffee -co test/compiled/src/ src/ && coffee -co test/compiled/ test/*.coffee",
   "src_files": [
     "test/lib/chai.js",
     "test/lib/rangy-core.js",
