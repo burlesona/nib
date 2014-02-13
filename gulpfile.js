@@ -24,11 +24,11 @@ var path = {
 gulp.task('setup', function(){
   // Editor JS
   gulp.src(path.src.core)
-    .pipe(coffee({bare: true}).on('error', gutil.log))
+    .pipe(coffee().on('error', gutil.log))
     .pipe(gulp.dest(path.dev.root));
   // Plugins JS
   gulp.src(path.src.plugins)
-    .pipe(coffee({bare: true}).on('error', gutil.log))
+    .pipe(coffee().on('error', gutil.log))
     .pipe(gulp.dest(path.dev.plugins));
   // Demo JS
   gulp.src(path.src.demo)
@@ -44,14 +44,14 @@ gulp.task('watch', function(){
   gulp.watch(path.src.core, function(event){
     console.log([event.path,event.type].join(" -- "));
     gulp.src(path.src.core)
-      .pipe(coffee({bare: true}).on('error', gutil.log))
+      .pipe(coffee().on('error', gutil.log))
       .pipe(gulp.dest(path.dev.root));
   });
   // Plugins JS
   gulp.watch(path.src.plugins, function(event){
     console.log([event.path,event.type].join(" -- "));
     gulp.src(path.src.plugins)
-      .pipe(coffee({bare: true}).on('error', gutil.log))
+      .pipe(coffee().on('error', gutil.log))
       .pipe(gulp.dest(path.dev.plugins));
   });
   // Demo JS
@@ -68,11 +68,11 @@ gulp.task('watch', function(){
 // Output the editor and plugins non-minified for development
 gulp.task('compile', function() {
   gulp.src(path.src.core)
-    .pipe(coffee({bare: true}).on('error', gutil.log))
+    .pipe(coffee().on('error', gutil.log))
     .pipe(concat('editor-core.js'))
     .pipe(gulp.dest(path.dist));
   gulp.src(path.src.plugins)
-    .pipe(coffee({bare: true}).on('error', gutil.log))
+    .pipe(coffee().on('error', gutil.log))
     .pipe(concat('editor-plugins.js'))
     .pipe(gulp.dest(path.dist));
 });
