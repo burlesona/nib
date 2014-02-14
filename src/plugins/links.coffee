@@ -13,7 +13,4 @@ class Nib.Plugins.Link extends Nib.Plugins.Base
 
   # Retrieve the href to display to the user
   getHref: ->
-    if (node = @editor.wrapped('a'))
-      node.href
-    else
-      undefined
+    node.href if (node = @editor.wrapped('a'))

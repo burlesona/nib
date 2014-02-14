@@ -154,8 +154,6 @@
       var node;
       if ((node = this.editor.wrapped('a'))) {
         return node.href;
-      } else {
-        return void 0;
       }
     };
 
