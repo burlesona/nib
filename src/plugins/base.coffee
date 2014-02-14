@@ -10,6 +10,10 @@ _ = Nib.Utils
 # A prototype plugin defining the methods that all plugins
 # must provide. All plugins should extend this prototype.
 class Nib.Plugins.Base
+  # An array of valid nodes is required for each plugin, but if the
+  # plugin does not need to reference nodes this can be an empty array
+  validNodes: []
+
   # Set a reference to the current editor so its
   # commands can be used, and then bind any events.
   constructor: (editor) ->

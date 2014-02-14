@@ -23,10 +23,7 @@ class root.ToolbarDialogItem
 class root.ToolbarDialogs extends root.ToolbarDialogItem
   constructor: (@container) ->
     super(@container.contentDocument)
-
     @linkDialog = @initializeDialogItem('link-dialog')
-    @fnDialog = @initializeDialogItem('fn-dialog')
-    @ktDialog = @initializeDialogItem('kt-dialog')
 
   initializeDialogItem: (id) ->
     new root.ToolbarDialogItem(@getElement("##{id}"))
@@ -59,12 +56,6 @@ createLinkHandlers = (editor) ->
   link = document.getElementById('link')
   link.addEventListener 'click', (event) ->
     event.preventDefault()
-    editor.link.toggle(prompt('URL:'))
-    false
-
-  link2 = document.getElementById('link2')
-  link2.addEventListener 'click', (event) ->
-    event.preventDefault()
     toolbarDialog.showLinkDialog('http://', true)
     false
 
@@ -72,18 +63,19 @@ createLinkHandlers = (editor) ->
   linkDialog.getElement('.save').addEventListener 'click', (event) ->
     event.preventDefault()
     url = linkDialog.getElement('.content').value
-    editor.link2.on(url)
+    editor.link.on(url)
     linkDialog.hide()
     false
 
   linkDialog.getElement('.remove').addEventListener 'click', (event) ->
     event.preventDefault()
-    editor.link2.off()
+    editor.link.off()
     false
 
-  editor.on 'report', (opts, editor) ->
-    if 'link2' in opts.states
-      node = editor.link2.selectionNodes(opts.nodes)[0]
+  editor.on 'report', (report, editor) ->
+    console.log 'editor report', report
+    if 'link' in report.states
+      node = editor.link.selectionNodes(report.nodes)[0]
       toolbarDialog.showLinkDialog(node.href)
     else
       linkDialog.hide()

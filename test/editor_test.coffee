@@ -44,54 +44,54 @@ describe "Nib.Editor", ->
   describe "links", ->
     it "should set href", ->
       testNodeWithSelection '|click here|', true, (node) ->
-        ed = new Nib.Editor node: node, plugins:['link2']
+        ed = new Nib.Editor node: node, plugins:['link']
         ed.activate()
-        ed.link2.on('http://www.google.com')
+        ed.link.on('http://www.google.com')
 
         expected = '<a href="http://www.google.com">click here</a>'
         assert.equal(node.innerHTML, expected)
 
     it "should set http protocol", ->
       testNodeWithSelection '|click here|', true, (node) ->
-        ed = new Nib.Editor node: node, plugins:['link2']
+        ed = new Nib.Editor node: node, plugins:['link']
         ed.activate()
-        ed.link2.on('www.google.com')
+        ed.link.on('www.google.com')
 
         expected = '<a href="http://www.google.com">click here</a>'
         assert.equal(node.innerHTML, expected)
 
     it "should not add http to an https protocol", ->
       testNodeWithSelection '|click here|', true, (node) ->
-        ed = new Nib.Editor node: node, plugins:['link2']
+        ed = new Nib.Editor node: node, plugins:['link']
         ed.activate()
-        ed.link2.on('https://www.google.com')
+        ed.link.on('https://www.google.com')
 
         expected = '<a href="https://www.google.com">click here</a>'
         assert.equal(node.innerHTML, expected)
 
     it "should not add http to an ftp protocol", ->
       testNodeWithSelection '|click here|', true, (node) ->
-        ed = new Nib.Editor node: node, plugins:['link2']
+        ed = new Nib.Editor node: node, plugins:['link']
         ed.activate()
-        ed.link2.on('ftp://www.google.com')
+        ed.link.on('ftp://www.google.com')
 
         expected = '<a href="ftp://www.google.com">click here</a>'
         assert.equal(node.innerHTML, expected)
 
     it "should set http if in middle of url but not the beginning", ->
       testNodeWithSelection '|click here|', true, (node) ->
-        ed = new Nib.Editor node: node, plugins:['link2']
+        ed = new Nib.Editor node: node, plugins:['link']
         ed.activate()
-        ed.link2.on('www.google-http.com')
+        ed.link.on('www.google-http.com')
 
         expected = '<a href="http://www.google-http.com">click here</a>'
         assert.equal(node.innerHTML, expected)
 
     it "should update selected link", ->
       testNodeWithSelection '<a href="http://a">|click here|</a>', true, (node) ->
-        ed = new Nib.Editor node: node, plugins:['link2']
+        ed = new Nib.Editor node: node, plugins:['link']
         ed.activate()
-        ed.link2.on('b')
+        ed.link.on('b')
 
         expected = '<a href="http://b">click here</a>'
         assert.equal(node.innerHTML, expected)

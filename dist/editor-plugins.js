@@ -7,6 +7,8 @@
   _ = Nib.Utils;
 
   Nib.Plugins.Base = (function() {
+    Base.prototype.validNodes = [];
+
     function Base(editor) {
       this.editor = editor;
       this.initEvents();
@@ -120,7 +122,7 @@
 }).call(this);
 
 (function() {
-  var _ref, _ref1,
+  var _ref,
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -134,25 +136,7 @@
 
     Link.prototype.validNodes = ['a'];
 
-    Link.prototype.toggle = function(url) {
-      return this.editor.exec('createLink', url);
-    };
-
-    return Link;
-
-  })(Nib.Plugins.Base);
-
-  Nib.Plugins.Link2 = (function(_super) {
-    __extends(Link2, _super);
-
-    function Link2() {
-      _ref1 = Link2.__super__.constructor.apply(this, arguments);
-      return _ref1;
-    }
-
-    Link2.prototype.validNodes = ['a'];
-
-    Link2.prototype.on = function(url) {
+    Link.prototype.on = function(url) {
       var node;
       if (url.indexOf('://') === -1) {
         url = "http://" + url;
@@ -162,11 +146,18 @@
       return node;
     };
 
-    Link2.prototype.off = function() {
+    Link.prototype.off = function() {
       return this.editor.unwrap('a');
     };
 
-    return Link2;
+    Link.prototype.getHref = function() {
+      var node;
+      if ((node = this.editor.wrapped('a'))) {
+        return node.href;
+      }
+    };
+
+    return Link;
 
   })(Nib.Plugins.Base);
 
