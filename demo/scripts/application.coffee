@@ -9,8 +9,8 @@ el = document.getElementById 'testblock'
 root.ed = new Nib.Editor
   node: el,
   plugins: ['bold', 'italic', 'underline', 'strikethrough',
-            'subscript', 'superscript', 'link', 'outdent',
-            'indent', 'bold2', 'link2']
+            'subscript', 'superscript', 'outdent',
+            'indent', 'link', 'bold2']
 
 ed.on 'editor:on', (editor) ->
   editor.node.className += ' editing'
