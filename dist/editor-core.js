@@ -319,6 +319,18 @@
       return this.checkSelection();
     };
 
+    Editor.prototype.selectNode = function(node, selection) {
+      var range;
+      if (selection == null) {
+        selection = null;
+      }
+      selection = selection || this.getSelection();
+      range = rangy.createRange();
+      range.selectNode(node);
+      selection.setSingleRange(range);
+      return this.checkSelection();
+    };
+
     Editor.prototype.wrap = function(tagName) {
       var newRange, node, range, selection;
       selection = this.getSelection();
@@ -336,17 +348,15 @@
     };
 
     Editor.prototype.lookForTags = function(tagName, nodes) {
-      var node, tags, _i, _len;
-      tags = [];
+      var node, _i, _len, _results;
+      _results = [];
       for (_i = 0, _len = nodes.length; _i < _len; _i++) {
         node = nodes[_i];
-        if (node.nodeType === 1) {
-          if (node.tagName.toLowerCase() === tagName) {
-            tags.push(node);
-          }
+        if (node.nodeType === 1 && node.tagName.toLowerCase() === tagName) {
+          _results.push(node);
         }
       }
-      return tags;
+      return _results;
     };
 
     Editor.prototype.lookForTag = function(tagName, nodes) {
@@ -362,18 +372,15 @@
     };
 
     Editor.prototype.wrapped = function(tagName) {
-      var nodes;
-      nodes = this.getSelectedNodes();
-      return this.lookForTag(tagName, nodes);
+      return this.lookForTag(tagName, this.getSelectedNodes());
     };
 
     Editor.prototype.unwrap = function(tagName) {
-      var childNode, node, nodes, savedSelection, tags, _i, _len;
-      nodes = this.getSelectedNodes();
-      tags = this.lookForTags(tagName, nodes);
+      var childNode, node, savedSelection, _i, _len, _ref;
       savedSelection = this.saveSelection();
-      for (_i = 0, _len = tags.length; _i < _len; _i++) {
-        node = tags[_i];
+      _ref = this.lookForTags(tagName, this.getSelectedNodes());
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        node = _ref[_i];
         while ((childNode = node.firstChild)) {
           node.parentNode.insertBefore(childNode, node);
         }

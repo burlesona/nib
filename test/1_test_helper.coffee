@@ -2,10 +2,10 @@
 root = exports ? this
 
 # Nib Test Helpers
-root.makeNode = (type,html) ->
+root.makeNode = (type,html,append=true) ->
   el = document.createElement(type)
   el.innerHTML = html
-  document.body.appendChild(el)
+  document.body.appendChild(el) if append
   el
 
 root.testNode = (type,html,callback) ->

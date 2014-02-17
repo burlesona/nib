@@ -148,7 +148,16 @@ class Nib.Editor extends Nib.Events
     selection.restoreSelection()
     @checkSelection()
 
-  # Wrapp current selection with a tag of type `tagName`
+  # Set the current to be the given node and fire checkSelection to notify
+  # plugins and event listeners
+  selectNode: (node, selection = null) ->
+    selection = selection or @getSelection()
+    range = rangy.createRange()
+    range.selectNode(node)
+    selection.setSingleRange(range)
+    @checkSelection()
+
+  # Wrap current selection with a tag of type `tagName`
   wrap: (tagName) ->
     selection = @getSelection()
     range = selection.getRangeAt(0)
