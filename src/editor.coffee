@@ -102,7 +102,7 @@ class Nib.Editor extends Nib.Events
   getSelection: ->
     rangy.getSelection()
 
-  # Get the current selected nodes
+  # Get the current selected nodes (from current to the top of the hierarchy)
   getSelectedNodes: () ->
     selection = @getSelection()
     nodes = []
@@ -135,7 +135,7 @@ class Nib.Editor extends Nib.Events
     @trigger('report', opts)
     @detach(range)
 
-
+  # Call detach on rangy elements to free the selection and memory
   detach: (args...) ->
     rangyEl.detach() for rangyEl in args when rangyEl
 
@@ -148,6 +148,7 @@ class Nib.Editor extends Nib.Events
     selection.restoreSelection()
     @checkSelection()
 
+  # Wrapp current selection with a tag of type `tagName`
   wrap: (tagName) ->
     selection = @getSelection()
     range = selection.getRangeAt(0)
@@ -167,26 +168,26 @@ class Nib.Editor extends Nib.Events
     @detach(range)
     node
 
+  # Filter `nodes` looking for nodes of type `tagName`, `tagName` must be
+  # a tag name in lowercase
   lookForTags: (tagName, nodes) ->
-    tags = []
-    for node in nodes when node.nodeType == 1
-      if node.tagName.toLowerCase() == tagName
-        tags.push(node)
-    tags
+    (node for node in nodes when node.nodeType == 1 and
+                                 node.tagName.toLowerCase() == tagName)
 
+  # Return the first node in `nodes` of type `tagName`, `tagName` must be a tag
+  # name in lowercase
   lookForTag: (tagName, nodes) ->
     for node in nodes when node.nodeType == 1
       return node if node.tagName.toLowerCase() == tagName
 
+  # Return first wrapper of type `tagName` in current selection
   wrapped: (tagName) ->
-    nodes = @getSelectedNodes()
-    @lookForTag(tagName, nodes)
+    @lookForTag(tagName, @getSelectedNodes())
 
+  # Unwrap the closes `tagName` in current selection
   unwrap: (tagName) ->
-    nodes = @getSelectedNodes()
-    tags = @lookForTags(tagName, nodes)
     savedSelection = @saveSelection()
-    for node in tags
+    for node in @lookForTags(tagName, @getSelectedNodes())
       while (childNode = node.firstChild)
         # Here we must not delete & recreate nodes, we just move them. The
         # selection can't be restored when the nodes gets deleted.
