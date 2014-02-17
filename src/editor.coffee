@@ -177,17 +177,17 @@ class Nib.Editor extends Nib.Events
     @detach(range)
     node
 
-  # Filter `nodes` looking for nodes of type `tagName`, `tagName` must be
-  # a tag name in lowercase
+  # Filter `nodes` looking for nodes of type `tagName`
   findTags: (tagName, nodes) ->
+    tagName = tagName.toUpperCase()
     (node for node in nodes when node.nodeType == 1 and
-                                 node.tagName.toLowerCase() == tagName)
+                                 node.tagName == tagName)
 
-  # Return the first node in `nodes` of type `tagName`, `tagName` must be a tag
-  # name in lowercase
+  # Return the first node in `nodes` of type `tagName`
   findTag: (tagName, nodes) ->
+    tagName = tagName.toUpperCase()
     for node in nodes when node.nodeType == 1
-      return node if node.tagName.toLowerCase() == tagName
+      return node if node.tagName == tagName
 
   # Return first wrapper of type `tagName` in current selection
   wrapped: (tagName) ->

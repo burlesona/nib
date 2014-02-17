@@ -349,10 +349,11 @@
 
     Editor.prototype.findTags = function(tagName, nodes) {
       var node, _i, _len, _results;
+      tagName = tagName.toUpperCase();
       _results = [];
       for (_i = 0, _len = nodes.length; _i < _len; _i++) {
         node = nodes[_i];
-        if (node.nodeType === 1 && node.tagName.toLowerCase() === tagName) {
+        if (node.nodeType === 1 && node.tagName === tagName) {
           _results.push(node);
         }
       }
@@ -361,10 +362,11 @@
 
     Editor.prototype.findTag = function(tagName, nodes) {
       var node, _i, _len;
+      tagName = tagName.toUpperCase();
       for (_i = 0, _len = nodes.length; _i < _len; _i++) {
         node = nodes[_i];
         if (node.nodeType === 1) {
-          if (node.tagName.toLowerCase() === tagName) {
+          if (node.tagName === tagName) {
             return node;
           }
         }
