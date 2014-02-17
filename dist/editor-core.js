@@ -347,7 +347,7 @@
       return node;
     };
 
-    Editor.prototype.lookForTags = function(tagName, nodes) {
+    Editor.prototype.findTags = function(tagName, nodes) {
       var node, _i, _len, _results;
       _results = [];
       for (_i = 0, _len = nodes.length; _i < _len; _i++) {
@@ -359,7 +359,7 @@
       return _results;
     };
 
-    Editor.prototype.lookForTag = function(tagName, nodes) {
+    Editor.prototype.findTag = function(tagName, nodes) {
       var node, _i, _len;
       for (_i = 0, _len = nodes.length; _i < _len; _i++) {
         node = nodes[_i];
@@ -372,13 +372,13 @@
     };
 
     Editor.prototype.wrapped = function(tagName) {
-      return this.lookForTag(tagName, this.getSelectedNodes());
+      return this.findTag(tagName, this.getSelectedNodes());
     };
 
     Editor.prototype.unwrap = function(tagName) {
       var childNode, node, savedSelection, _i, _len, _ref;
       savedSelection = this.saveSelection();
-      _ref = this.lookForTags(tagName, this.getSelectedNodes());
+      _ref = this.findTags(tagName, this.getSelectedNodes());
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         node = _ref[_i];
         while ((childNode = node.firstChild)) {

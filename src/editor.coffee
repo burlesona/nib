@@ -179,24 +179,24 @@ class Nib.Editor extends Nib.Events
 
   # Filter `nodes` looking for nodes of type `tagName`, `tagName` must be
   # a tag name in lowercase
-  lookForTags: (tagName, nodes) ->
+  findTags: (tagName, nodes) ->
     (node for node in nodes when node.nodeType == 1 and
                                  node.tagName.toLowerCase() == tagName)
 
   # Return the first node in `nodes` of type `tagName`, `tagName` must be a tag
   # name in lowercase
-  lookForTag: (tagName, nodes) ->
+  findTag: (tagName, nodes) ->
     for node in nodes when node.nodeType == 1
       return node if node.tagName.toLowerCase() == tagName
 
   # Return first wrapper of type `tagName` in current selection
   wrapped: (tagName) ->
-    @lookForTag(tagName, @getSelectedNodes())
+    @findTag(tagName, @getSelectedNodes())
 
   # Unwrap the closes `tagName` in current selection
   unwrap: (tagName) ->
     savedSelection = @saveSelection()
-    for node in @lookForTags(tagName, @getSelectedNodes())
+    for node in @findTags(tagName, @getSelectedNodes())
       while (childNode = node.firstChild)
         # Here we must not delete & recreate nodes, we just move them. The
         # selection can't be restored when the nodes gets deleted.
