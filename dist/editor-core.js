@@ -89,6 +89,14 @@
       return startRange.detach();
     };
 
+    SelectionHandler.prototype.collapseToEnd = function() {
+      return this.selection.collapseToEnd();
+    };
+
+    SelectionHandler.prototype.collapseToStart = function() {
+      return this.selection.collapseToStart();
+    };
+
     return SelectionHandler;
 
   })();

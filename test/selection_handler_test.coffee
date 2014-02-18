@@ -21,3 +21,23 @@ describe "Nib.SelectionHandler", ->
             assert.equal(root.innerHTML, "hello")
             markSelection()
             assert.equal(root.innerHTML, "h|ell|o")
+
+  describe "changing selection", ->
+    context "for |a phrase| forwards", ->
+      it "should collapse selection to end", ->
+        testNodeWithSelection "|a phrase|", false, (root) ->
+          selection = new Nib.SelectionHandler()
+          selection.collapseToEnd()
+          assert.equal root.innerHTML, "a phrase"
+          markSelection()
+          assert.equal root.innerHTML, "a phrase||"
+      it "should collapse selection to the beginning", ->
+        testNodeWithSelection "|a phrase|", false, (root) ->
+          selection = new Nib.SelectionHandler()
+          selection.collapseToStart()
+          assert.equal root.innerHTML, "a phrase"
+          markSelection()
+          assert.equal root.innerHTML, "||a phrase"
+
+
+

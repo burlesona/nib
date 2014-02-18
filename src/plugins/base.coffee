@@ -14,6 +14,7 @@ class Nib.Plugins.Base
   # plugin does not need to reference nodes this can be an empty array
   validNodes: []
 
+  #
   # Set a reference to the current editor so its
   # commands can be used, and then bind any events.
   constructor: (editor) ->

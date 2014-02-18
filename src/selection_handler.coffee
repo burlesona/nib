@@ -33,3 +33,13 @@ class Nib.SelectionHandler
       @selection.setSingleRange(startRange)
 
     startRange.detach()
+
+  # Collapse the current selection to the end
+  # ie: `|hello|` becomes `hello||`
+  collapseToEnd: ->
+    @selection.collapseToEnd()
+
+  # Collapse the current selection to the beginning
+  # ie: `|hello|` becomes `||hello`
+  collapseToStart: ->
+    @selection.collapseToStart()
