@@ -55,6 +55,8 @@
 
     MetaKeyAction.prototype.key = null;
 
+    MetaKeyAction.prototype.name = null;
+
     MetaKeyAction.prototype.method = 'toggle';
 
     MetaKeyAction.prototype.initEvents = function() {
@@ -63,7 +65,7 @@
       return this.editor.on('keydown', function(event, editor) {
         if ((event.ctrlKey || event.metaKey) && event.which === _this.key) {
           event.preventDefault();
-          return editor[_this.method]();
+          return editor[_this.name][_this.method]();
         }
       });
     };
@@ -176,6 +178,8 @@
       return _ref;
     }
 
+    Bold.prototype.name = 'bold';
+
     Bold.prototype.key = 66;
 
     Bold.prototype.validNodes = ['b', 'strong'];
@@ -196,6 +200,8 @@
       return _ref1;
     }
 
+    Italic.prototype.name = 'italic';
+
     Italic.prototype.key = 73;
 
     Italic.prototype.validNodes = ['i', 'em'];
@@ -215,6 +221,8 @@
       _ref2 = Underline.__super__.constructor.apply(this, arguments);
       return _ref2;
     }
+
+    Underline.prototype.name = 'underline';
 
     Underline.prototype.key = 85;
 

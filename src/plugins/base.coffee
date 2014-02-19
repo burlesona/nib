@@ -56,6 +56,12 @@ class Nib.Plugins.MetaKeyAction extends Nib.Plugins.Base
   # should trigger this plugin's toggle method.
   key: null
 
+  # In order to share the initEvents method across plugins we need a way for
+  # the method to know the name of the current plugin so that it can be called
+  # on the editor. There isn't a standard way to do this in JS (or coffee), so
+  # we need to define `name` on any meta key action.
+  name: null
+
   # A static instance property for the name of the method that should be called
   # By default this method is `toggle`, and most plugins should use that method
   # name. However, if a plugin does something other than change the state of the
@@ -67,4 +73,4 @@ class Nib.Plugins.MetaKeyAction extends Nib.Plugins.Base
     @editor.on 'keydown', (event, editor) =>
       if (event.ctrlKey or event.metaKey) and event.which == @key
         event.preventDefault()
-        editor[@method]()
+        editor[@name][@method]()

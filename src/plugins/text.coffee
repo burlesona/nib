@@ -1,14 +1,17 @@
 class Nib.Plugins.Bold extends Nib.Plugins.MetaKeyAction
+  name: 'bold'
   key: 66  # key: b
   validNodes: ['b', 'strong']
   toggle: -> @editor.exec('bold')
 
 class Nib.Plugins.Italic extends Nib.Plugins.MetaKeyAction
+  name: 'italic'
   key: 73  # key: i
   validNodes: ['i', 'em']
   toggle: -> @editor.exec('italic')
 
 class Nib.Plugins.Underline extends Nib.Plugins.MetaKeyAction
+  name: 'underline'
   key: 85  # key: u
   validNodes: ['u']
   toggle: -> @editor.exec('underline')
