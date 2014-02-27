@@ -114,7 +114,7 @@ class Nib.Editor extends Nib.Events
       else
         nodes = range.getNodes()
       nodes = _.uniqueNodes(_.flatten(_.parentNodes(@node, nodes)))
-      range.detach()
+      range.detach() unless range.detached
 
     selection.detach()
     nodes
@@ -133,7 +133,7 @@ class Nib.Editor extends Nib.Events
       opts.states.push(name) if this[name].checkSelection(opts)
 
     @trigger('report', opts)
-    @detach(range)
+    @detach(range) unless range.detached
 
   # Call detach on rangy elements to free the selection and memory
   detach: (args...) ->
@@ -174,7 +174,7 @@ class Nib.Editor extends Nib.Events
     selection.setSingleRange(newRange)
     @checkSelection(selection)
 
-    @detach(range)
+    @detach(range) unless range.detached
     node
 
   # Filter `nodes` looking for nodes of type `tagName`

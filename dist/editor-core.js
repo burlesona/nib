@@ -279,7 +279,9 @@
           nodes = range.getNodes();
         }
         nodes = _.uniqueNodes(_.flatten(_.parentNodes(this.node, nodes)));
-        range.detach();
+        if (!range.detached) {
+          range.detach();
+        }
       }
       selection.detach();
       return nodes;
@@ -308,7 +310,9 @@
         }
       }
       this.trigger('report', opts);
-      return this.detach(range);
+      if (!range.detached) {
+        return this.detach(range);
+      }
     };
 
     Editor.prototype.detach = function() {
@@ -360,7 +364,9 @@
       newRange.selectNodeContents(node);
       selection.setSingleRange(newRange);
       this.checkSelection(selection);
-      this.detach(range);
+      if (!range.detached) {
+        this.detach(range);
+      }
       return node;
     };
 
