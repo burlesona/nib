@@ -103,8 +103,8 @@ class Nib.Editor extends Nib.Events
     rangy.getSelection()
 
   # Get the current selected nodes (from current to the top of the hierarchy)
-  getSelectedNodes: () ->
-    selection = @getSelection()
+  getSelectedNodes: (selection = null) ->
+    selection = selection or @getSelection()
     nodes = []
     if selection.rangeCount
       range = selection.getRangeAt(0)
@@ -120,13 +120,13 @@ class Nib.Editor extends Nib.Events
     nodes
 
   # Report the state of the current selection
-  checkSelection: () ->
-    selection = @getSelection()
+  checkSelection: (selection = null) ->
+    selection = selection or @getSelection()
     range = selection.getRangeAt(0) if selection.rangeCount
     opts =
       selection: selection
       range: range
-      nodes: @getSelectedNodes()
+      nodes: @getSelectedNodes(selection)
       states: []
 
     for name in @plugins
@@ -155,11 +155,11 @@ class Nib.Editor extends Nib.Events
     range = rangy.createRange()
     range.selectNode(node)
     selection.setSingleRange(range)
-    @checkSelection()
+    @checkSelection(selection)
 
   # Wrap current selection with a tag of type `tagName`
-  wrap: (tagName) ->
-    selection = @getSelection()
+  wrap: (tagName, selection = null) ->
+    selection = selection or @getSelection()
     range = selection.getRangeAt(0)
 
     # create new wrapper node
@@ -172,7 +172,7 @@ class Nib.Editor extends Nib.Events
     newRange = rangy.createRange()
     newRange.selectNodeContents(node)
     selection.setSingleRange(newRange)
-    @checkSelection()
+    @checkSelection(selection)
 
     @detach(range)
     node

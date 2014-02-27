@@ -262,9 +262,12 @@
       return rangy.getSelection();
     };
 
-    Editor.prototype.getSelectedNodes = function() {
-      var nodes, range, selection;
-      selection = this.getSelection();
+    Editor.prototype.getSelectedNodes = function(selection) {
+      var nodes, range;
+      if (selection == null) {
+        selection = null;
+      }
+      selection = selection || this.getSelection();
       nodes = [];
       if (selection.rangeCount) {
         range = selection.getRangeAt(0);
@@ -282,16 +285,19 @@
       return nodes;
     };
 
-    Editor.prototype.checkSelection = function() {
-      var name, opts, range, selection, _i, _len, _ref;
-      selection = this.getSelection();
+    Editor.prototype.checkSelection = function(selection) {
+      var name, opts, range, _i, _len, _ref;
+      if (selection == null) {
+        selection = null;
+      }
+      selection = selection || this.getSelection();
       if (selection.rangeCount) {
         range = selection.getRangeAt(0);
       }
       opts = {
         selection: selection,
         range: range,
-        nodes: this.getSelectedNodes(),
+        nodes: this.getSelectedNodes(selection),
         states: []
       };
       _ref = this.plugins;
@@ -336,12 +342,15 @@
       range = rangy.createRange();
       range.selectNode(node);
       selection.setSingleRange(range);
-      return this.checkSelection();
+      return this.checkSelection(selection);
     };
 
-    Editor.prototype.wrap = function(tagName) {
-      var newRange, node, range, selection;
-      selection = this.getSelection();
+    Editor.prototype.wrap = function(tagName, selection) {
+      var newRange, node, range;
+      if (selection == null) {
+        selection = null;
+      }
+      selection = selection || this.getSelection();
       range = selection.getRangeAt(0);
       node = document.createElement(tagName);
       if (range.canSurroundContents()) {
@@ -350,7 +359,7 @@
       newRange = rangy.createRange();
       newRange.selectNodeContents(node);
       selection.setSingleRange(newRange);
-      this.checkSelection();
+      this.checkSelection(selection);
       this.detach(range);
       return node;
     };
