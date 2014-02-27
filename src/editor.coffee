@@ -152,9 +152,11 @@ class Nib.Editor extends Nib.Events
   # plugins and event listeners
   selectNode: (node, selection = null) ->
     selection = selection or @getSelection()
-    range = rangy.createRange()
+    # Update range directly in the selection, otherwise setSingleRange() will
+    # reset the selection if the node is "hard" to unselect like when there's
+    # no content on it
+    range = selection.getRangeAt(0)
     range.selectNode(node)
-    selection.setSingleRange(range)
     @checkSelection(selection)
 
   # Wrap current selection with a tag of type `tagName`

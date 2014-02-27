@@ -343,9 +343,8 @@
         selection = null;
       }
       selection = selection || this.getSelection();
-      range = rangy.createRange();
+      range = selection.getRangeAt(0);
       range.selectNode(node);
-      selection.setSingleRange(range);
       return this.checkSelection(selection);
     };
 
