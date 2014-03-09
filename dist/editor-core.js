@@ -310,7 +310,7 @@
         }
       }
       this.trigger('report', opts);
-      if (!range.detached) {
+      if (range && !range.detached) {
         return this.detach(range);
       }
     };

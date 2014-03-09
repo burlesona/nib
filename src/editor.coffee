@@ -133,7 +133,7 @@ class Nib.Editor extends Nib.Events
       opts.states.push(name) if this[name].checkSelection(opts)
 
     @trigger('report', opts)
-    @detach(range) unless range.detached
+    @detach(range) if range and not range.detached
 
   # Call detach on rangy elements to free the selection and memory
   detach: (args...) ->
