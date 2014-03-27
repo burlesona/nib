@@ -59,6 +59,8 @@
 }).call(this);
 
 (function() {
+  var __slice = [].slice;
+
   Nib.SelectionHandler = (function() {
     function SelectionHandler() {
       this.selection = rangy.getSelection();
@@ -81,12 +83,12 @@
         endRange.setEnd(this.extentNode, this.extentOffset);
         this.selection.addRange(startRange);
         this.selection.addRange(endRange, true);
-        endRange.detach();
+        this.detach(endRange);
       } else {
         startRange.setEnd(this.extentNode, this.extentOffset);
         this.selection.setSingleRange(startRange);
       }
-      return startRange.detach();
+      return this.detach(startRange);
     };
 
     SelectionHandler.prototype.collapseToEnd = function() {
@@ -95,6 +97,24 @@
 
     SelectionHandler.prototype.collapseToStart = function() {
       return this.selection.collapseToStart();
+    };
+
+    SelectionHandler.prototype.detach = function() {
+      var args, err, rangyEl, _i, _len, _results;
+      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      _results = [];
+      for (_i = 0, _len = args.length; _i < _len; _i++) {
+        rangyEl = args[_i];
+        if (rangyEl) {
+          try {
+            _results.push(rangyEl.detach());
+          } catch (_error) {
+            err = _error;
+            _results.push(null);
+          }
+        }
+      }
+      return _results;
     };
 
     return SelectionHandler;
@@ -279,11 +299,9 @@
           nodes = range.getNodes();
         }
         nodes = _.uniqueNodes(_.flatten(_.parentNodes(this.node, nodes)));
-        if (!range.detached) {
-          range.detach();
-        }
+        this.detach(range);
       }
-      selection.detach();
+      this.detach(selection);
       return nodes;
     };
 
@@ -310,19 +328,22 @@
         }
       }
       this.trigger('report', opts);
-      if (range && !range.detached) {
-        return this.detach(range);
-      }
+      return this.detach(range);
     };
 
     Editor.prototype.detach = function() {
-      var args, rangyEl, _i, _len, _results;
+      var args, err, rangyEl, _i, _len, _results;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       _results = [];
       for (_i = 0, _len = args.length; _i < _len; _i++) {
         rangyEl = args[_i];
         if (rangyEl) {
-          _results.push(rangyEl.detach());
+          try {
+            _results.push(rangyEl.detach());
+          } catch (_error) {
+            err = _error;
+            _results.push(null);
+          }
         }
       }
       return _results;
@@ -363,9 +384,7 @@
       newRange.selectNodeContents(node);
       selection.setSingleRange(newRange);
       this.checkSelection(selection);
-      if (!range.detached) {
-        this.detach(range);
-      }
+      this.detach(range);
       return node;
     };
 

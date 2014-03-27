@@ -27,12 +27,12 @@ class Nib.SelectionHandler
       @selection.addRange(startRange)
       @selection.addRange(endRange, true)
 
-      endRange.detach()
+      @detach(endRange)
     else
       startRange.setEnd(@extentNode, @extentOffset)
       @selection.setSingleRange(startRange)
 
-    startRange.detach()
+    @detach(startRange)
 
   # Collapse the current selection to the end
   # ie: `|hello|` becomes `hello||`
@@ -43,3 +43,13 @@ class Nib.SelectionHandler
   # ie: `|hello|` becomes `||hello`
   collapseToStart: ->
     @selection.collapseToStart()
+
+  # Call detach on rangy elements to free the selection and memory
+  detach: (args...) ->
+    for rangyEl in args when rangyEl
+      # Catch detaching errors, node could be removed from the DOM, etc, avoid
+      # breaking the editor while detaching a selection
+      try
+        rangyEl.detach()
+      catch err
+        null

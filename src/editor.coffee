@@ -114,9 +114,8 @@ class Nib.Editor extends Nib.Events
       else
         nodes = range.getNodes()
       nodes = _.uniqueNodes(_.flatten(_.parentNodes(@node, nodes)))
-      range.detach() unless range.detached
-
-    selection.detach()
+      @detach(range)
+    @detach(selection)
     nodes
 
   # Report the state of the current selection
@@ -133,11 +132,17 @@ class Nib.Editor extends Nib.Events
       opts.states.push(name) if this[name].checkSelection(opts)
 
     @trigger('report', opts)
-    @detach(range) if range and not range.detached
+    @detach(range)
 
   # Call detach on rangy elements to free the selection and memory
   detach: (args...) ->
-    rangyEl.detach() for rangyEl in args when rangyEl
+    for rangyEl in args when rangyEl
+      # Catch detaching errors, node could be removed from the DOM, etc, avoid
+      # breaking the editor while detaching a selection
+      try
+        rangyEl.detach()
+      catch err
+        null
 
   # Make a copy of the selection so we can restore it after transformation
   saveSelection: () ->
@@ -175,8 +180,7 @@ class Nib.Editor extends Nib.Events
     newRange.selectNodeContents(node)
     selection.setSingleRange(newRange)
     @checkSelection(selection)
-
-    @detach(range) unless range.detached
+    @detach(range)
     node
 
   # Filter `nodes` looking for nodes of type `tagName`
