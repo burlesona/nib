@@ -34,3 +34,12 @@ Nib.Utils =
 
   domNodes: (nodes) ->
     nodes.filter (n) -> n.nodeType == 1
+
+  rangyDetach: (args...) ->
+    for rangyEl in args when rangyEl
+      # Catch detaching errors, node could be removed from the DOM, etc, avoid
+      # breaking the editor while detaching a selection, specially on IE
+      try
+        rangyEl.detach()
+      catch err
+        null

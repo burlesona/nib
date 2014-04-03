@@ -61,69 +61,6 @@
 (function() {
   var __slice = [].slice;
 
-  Nib.SelectionHandler = (function() {
-    function SelectionHandler() {
-      this.selection = rangy.getSelection();
-      this.baseNode = this.selection.nativeSelection.baseNode;
-      this.baseOffset = this.selection.nativeSelection.baseOffset;
-      this.extentNode = this.selection.nativeSelection.extentNode;
-      this.extentOffset = this.selection.nativeSelection.extentOffset;
-      this.backwards = this.selection.isBackwards();
-    }
-
-    SelectionHandler.prototype.restoreSelection = function() {
-      var endRange, startRange;
-      startRange = rangy.createRange();
-      startRange.setStart(this.baseNode, this.baseOffset);
-      this.selection.removeAllRanges();
-      if (this.backwards) {
-        startRange.setEnd(this.baseNode, this.baseOffset);
-        endRange = rangy.createRange();
-        endRange.setStart(this.extentNode, this.extentOffset);
-        endRange.setEnd(this.extentNode, this.extentOffset);
-        this.selection.addRange(startRange);
-        this.selection.addRange(endRange, true);
-        this.detach(endRange);
-      } else {
-        startRange.setEnd(this.extentNode, this.extentOffset);
-        this.selection.setSingleRange(startRange);
-      }
-      return this.detach(startRange);
-    };
-
-    SelectionHandler.prototype.collapseToEnd = function() {
-      return this.selection.collapseToEnd();
-    };
-
-    SelectionHandler.prototype.collapseToStart = function() {
-      return this.selection.collapseToStart();
-    };
-
-    SelectionHandler.prototype.detach = function() {
-      var args, err, rangyEl, _i, _len, _results;
-      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      _results = [];
-      for (_i = 0, _len = args.length; _i < _len; _i++) {
-        rangyEl = args[_i];
-        if (rangyEl) {
-          try {
-            _results.push(rangyEl.detach());
-          } catch (_error) {
-            err = _error;
-            _results.push(null);
-          }
-        }
-      }
-      return _results;
-    };
-
-    return SelectionHandler;
-
-  })();
-
-}).call(this);
-
-(function() {
   Nib.Utils = {
     capitalize: function(string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
@@ -174,8 +111,79 @@
       return nodes.filter(function(n) {
         return n.nodeType === 1;
       });
+    },
+    rangyDetach: function() {
+      var args, err, rangyEl, _i, _len, _results;
+      args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      _results = [];
+      for (_i = 0, _len = args.length; _i < _len; _i++) {
+        rangyEl = args[_i];
+        if (rangyEl) {
+          try {
+            _results.push(rangyEl.detach());
+          } catch (_error) {
+            err = _error;
+            _results.push(null);
+          }
+        }
+      }
+      return _results;
     }
   };
+
+}).call(this);
+
+(function() {
+  var _;
+
+  _ = Nib.Utils;
+
+  Nib.SelectionHandler = (function() {
+    function SelectionHandler() {
+      this.selection = rangy.getSelection();
+      this.anchorNode = this.selection.anchorNode;
+      this.anchorOffset = this.selection.anchorOffset;
+      this.focusNode = this.selection.focusNode;
+      this.focusOffset = this.selection.focusOffset;
+      this.backwards = this.selection.isBackwards();
+    }
+
+    SelectionHandler.prototype.restoreSelection = function() {
+      var endRange, startRange;
+      startRange = rangy.createRange();
+      startRange.setStart(this.anchorNode, this.anchorOffset);
+      if (this.selection.anchorNode === null) {
+        this.selection = rangy.getSelection();
+      }
+      if (this.selection.rangeCount) {
+        this.selection.removeAllRanges();
+      }
+      if (this.backwards) {
+        startRange.setEnd(this.anchorNode, this.anchorOffset);
+        endRange = rangy.createRange();
+        endRange.setStart(this.focusNode, this.focusOffset);
+        endRange.setEnd(this.focusNode, this.focusOffset);
+        this.selection.addRange(startRange);
+        this.selection.addRange(endRange, true);
+        _.rangyDetach(endRange);
+      } else {
+        startRange.setEnd(this.focusNode, this.focusOffset);
+        this.selection.setSingleRange(startRange);
+      }
+      return _.rangyDetach(startRange);
+    };
+
+    SelectionHandler.prototype.collapseToEnd = function() {
+      return this.selection.collapseToEnd();
+    };
+
+    SelectionHandler.prototype.collapseToStart = function() {
+      return this.selection.collapseToStart();
+    };
+
+    return SelectionHandler;
+
+  })();
 
 }).call(this);
 
@@ -332,21 +340,9 @@
     };
 
     Editor.prototype.detach = function() {
-      var args, err, rangyEl, _i, _len, _results;
+      var args;
       args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-      _results = [];
-      for (_i = 0, _len = args.length; _i < _len; _i++) {
-        rangyEl = args[_i];
-        if (rangyEl) {
-          try {
-            _results.push(rangyEl.detach());
-          } catch (_error) {
-            err = _error;
-            _results.push(null);
-          }
-        }
-      }
-      return _results;
+      return _.rangyDetach.apply(_, args);
     };
 
     Editor.prototype.saveSelection = function() {
@@ -364,8 +360,14 @@
         selection = null;
       }
       selection = selection || this.getSelection();
-      range = selection.getRangeAt(0);
-      range.selectNode(node);
+      if (selection.rangeCount) {
+        range = selection.getRangeAt(0);
+        range.selectNode(node);
+      } else {
+        range = rangy.createRange();
+        range.selectNodeContents(node);
+        selection.setSingleRange(range);
+      }
       return this.checkSelection(selection);
     };
 
@@ -375,9 +377,11 @@
         selection = null;
       }
       selection = selection || this.getSelection();
-      range = selection.getRangeAt(0);
+      if (selection.rangeCount) {
+        range = selection.getRangeAt(0);
+      }
       node = document.createElement(tagName);
-      if (range.canSurroundContents()) {
+      if (range && range.canSurroundContents()) {
         range.surroundContents(node);
       }
       newRange = rangy.createRange();

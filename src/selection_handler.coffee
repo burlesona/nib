@@ -1,38 +1,42 @@
+# Use Nib Utilities
+_ = Nib.Utils
+
 # This class helps on keeping the selection when changing
 # selected nodes
 class Nib.SelectionHandler
   constructor: () ->
     @selection = rangy.getSelection()
 
-    @baseNode = @selection.nativeSelection.baseNode
-    @baseOffset = @selection.nativeSelection.baseOffset
-    @extentNode = @selection.nativeSelection.extentNode
-    @extentOffset = @selection.nativeSelection.extentOffset
+    @anchorNode = @selection.anchorNode
+    @anchorOffset = @selection.anchorOffset
+    @focusNode = @selection.focusNode
+    @focusOffset = @selection.focusOffset
 
     @backwards = @selection.isBackwards()
 
   restoreSelection: () ->
     startRange = rangy.createRange()
 
-    startRange.setStart(@baseNode, @baseOffset)
-    @selection.removeAllRanges()
+    startRange.setStart(@anchorNode, @anchorOffset)
+    @selection = rangy.getSelection() if @selection.anchorNode is null
+    @selection.removeAllRanges() if @selection.rangeCount
 
     if @backwards
-      startRange.setEnd(@baseNode, @baseOffset)
+      startRange.setEnd(@anchorNode, @anchorOffset)
 
       endRange = rangy.createRange()
-      endRange.setStart(@extentNode, @extentOffset)
-      endRange.setEnd(@extentNode, @extentOffset)
+      endRange.setStart(@focusNode, @focusOffset)
+      endRange.setEnd(@focusNode, @focusOffset)
 
       @selection.addRange(startRange)
       @selection.addRange(endRange, true)
 
-      @detach(endRange)
+      _.rangyDetach(endRange)
     else
-      startRange.setEnd(@extentNode, @extentOffset)
+      startRange.setEnd(@focusNode, @focusOffset)
       @selection.setSingleRange(startRange)
 
-    @detach(startRange)
+    _.rangyDetach(startRange)
 
   # Collapse the current selection to the end
   # ie: `|hello|` becomes `hello||`
@@ -43,13 +47,3 @@ class Nib.SelectionHandler
   # ie: `|hello|` becomes `||hello`
   collapseToStart: ->
     @selection.collapseToStart()
-
-  # Call detach on rangy elements to free the selection and memory
-  detach: (args...) ->
-    for rangyEl in args when rangyEl
-      # Catch detaching errors, node could be removed from the DOM, etc, avoid
-      # breaking the editor while detaching a selection
-      try
-        rangyEl.detach()
-      catch err
-        null

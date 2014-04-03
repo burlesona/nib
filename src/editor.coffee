@@ -136,13 +136,7 @@ class Nib.Editor extends Nib.Events
 
   # Call detach on rangy elements to free the selection and memory
   detach: (args...) ->
-    for rangyEl in args when rangyEl
-      # Catch detaching errors, node could be removed from the DOM, etc, avoid
-      # breaking the editor while detaching a selection
-      try
-        rangyEl.detach()
-      catch err
-        null
+    _.rangyDetach(args...)
 
   # Make a copy of the selection so we can restore it after transformation
   saveSelection: () ->
@@ -160,19 +154,24 @@ class Nib.Editor extends Nib.Events
     # Update range directly in the selection, otherwise setSingleRange() will
     # reset the selection if the node is "hard" to unselect like when there's
     # no content on it
-    range = selection.getRangeAt(0)
-    range.selectNode(node)
+    if selection.rangeCount
+      range = selection.getRangeAt(0)
+      range.selectNode(node)
+    else
+      range = rangy.createRange()
+      range.selectNodeContents(node)
+      selection.setSingleRange(range)
     @checkSelection(selection)
 
   # Wrap current selection with a tag of type `tagName`
   wrap: (tagName, selection = null) ->
     selection = selection or @getSelection()
-    range = selection.getRangeAt(0)
+    range = selection.getRangeAt(0) if selection.rangeCount
 
     # create new wrapper node
     node = document.createElement tagName
 
-    if range.canSurroundContents()
+    if range and range.canSurroundContents()
       range.surroundContents(node)
 
     # selection is lost in the process, reselect it
