@@ -71,27 +71,20 @@ class Nib.Editor extends Nib.Events
   initDOMEvents: ->
     @node.addEventListener 'keydown', @onKeydown.bind(@)
     @node.addEventListener 'keyup', @onKeyup.bind(@)
-    @node.addEventListener 'mousedown', @onMousedown.bind(@)
     @node.addEventListener 'mouseup', @onMouseup.bind(@)
 
   # Unbind DOM Event Listeners
   deactivateDOMEvents: ->
     @node.removeEventListener 'keydown', @onKeydown
     @node.removeEventListener 'keyup', @onKeyup
-    @node.removeEventListener 'mousedown', @onMousedown
     @node.removeEventListener 'mouseup', @onMouseup
 
   # Trigger check selection and report keydown
   onKeydown: (event) ->
-    @checkSelection()
     @trigger('keydown', event)
 
   # Check selection on keyup
   onKeyup: (event) ->
-    @checkSelection()
-
-  # Check selection on mouse down
-  onMousedown: (event) ->
     @checkSelection()
 
   # Check selection on mouse up

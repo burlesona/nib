@@ -258,27 +258,20 @@
     Editor.prototype.initDOMEvents = function() {
       this.node.addEventListener('keydown', this.onKeydown.bind(this));
       this.node.addEventListener('keyup', this.onKeyup.bind(this));
-      this.node.addEventListener('mousedown', this.onMousedown.bind(this));
       return this.node.addEventListener('mouseup', this.onMouseup.bind(this));
     };
 
     Editor.prototype.deactivateDOMEvents = function() {
       this.node.removeEventListener('keydown', this.onKeydown);
       this.node.removeEventListener('keyup', this.onKeyup);
-      this.node.removeEventListener('mousedown', this.onMousedown);
       return this.node.removeEventListener('mouseup', this.onMouseup);
     };
 
     Editor.prototype.onKeydown = function(event) {
-      this.checkSelection();
       return this.trigger('keydown', event);
     };
 
     Editor.prototype.onKeyup = function(event) {
-      return this.checkSelection();
-    };
-
-    Editor.prototype.onMousedown = function(event) {
       return this.checkSelection();
     };
 
