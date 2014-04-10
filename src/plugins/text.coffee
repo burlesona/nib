@@ -22,11 +22,23 @@ class Nib.Plugins.Strikethrough extends Nib.Plugins.Base
 
 class Nib.Plugins.Subscript extends Nib.Plugins.Base
   validNodes: ['sub']
-  toggle: -> @editor.exec('subscript')
+  toggle: ->
+    if @editor.wrapped('sup')   # sub/sup are mutually exclusive
+      @editor.unwrap('sup')
+    if @editor.wrapped('sub')
+      @editor.unwrap('sub')
+    else
+      @editor.wrap('sub')
 
 class Nib.Plugins.Superscript extends Nib.Plugins.Base
   validNodes: ['sup']
-  toggle: -> @editor.exec('superscript')
+  toggle: ->
+    if @editor.wrapped('sub')   # sub/sup are mutually exclusive
+      @editor.unwrap('sub')
+    if @editor.wrapped('sup')
+      @editor.unwrap('sup')
+    else
+      @editor.wrap('sup')
 
 class Nib.Plugins.Bold2 extends Nib.Plugins.Base
   validNodes: ['b', 'strong']
