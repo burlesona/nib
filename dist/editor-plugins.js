@@ -265,7 +265,14 @@
     Subscript.prototype.validNodes = ['sub'];
 
     Subscript.prototype.toggle = function() {
-      return this.editor.exec('subscript');
+      if (this.editor.wrapped('sup')) {
+        this.editor.unwrap('sup');
+      }
+      if (this.editor.wrapped('sub')) {
+        return this.editor.unwrap('sub');
+      } else {
+        return this.editor.wrap('sub');
+      }
     };
 
     return Subscript;
@@ -283,7 +290,14 @@
     Superscript.prototype.validNodes = ['sup'];
 
     Superscript.prototype.toggle = function() {
-      return this.editor.exec('superscript');
+      if (this.editor.wrapped('sub')) {
+        this.editor.unwrap('sub');
+      }
+      if (this.editor.wrapped('sup')) {
+        return this.editor.unwrap('sup');
+      } else {
+        return this.editor.wrap('sup');
+      }
     };
 
     return Superscript;
