@@ -191,8 +191,69 @@ class Nib.Editor extends Nib.Events
   wrapped: (tagName) ->
     @findTag(tagName, @getSelectedNodes())
 
+  # This function starts from a node, it travels all the way up to the root
+  # node. It returns true if we can find an element with specified tag,
+  # otherwise it returns false
+  findBoundary: (tagName, testNode) ->
+    tagName = tagName.toUpperCase()
+    while (testNode != @node)
+      return true if testNode.nodeType == 1 and testNode.tagName = tagName
+      testNode = testNode.parentNode
+    false
+
+  # Given a node/element and an offset, this function splits the node/element
+  # into 2 nodes/elements, notice the original node/element is kept, only
+  # one new node/element is created
+  #
+  # A separate argument determines whether the new node/element is inserted
+  # to the start or the end
+  splitBoundary: (splitNode, offset, isStart) ->
+    if splitNode.nodeType != 1
+      splitElement = splitNode.parentNode
+    else
+      splitElement = splitNode
+      splitNode = splitNode.firstChild
+    cloneElement = splitElement.cloneNode(true)
+    if isStart
+      cloneElement.firstChild.deleteData(offset, -1)
+      splitNode.deleteData(0, offset)
+      splitElement.parentNode.insertBefore(cloneElement, splitElement)
+    else
+      cloneElement.firstChild.deleteData(0, offset)
+      splitNode.deleteData(offset, -1)
+      sibling = splitElement.nextSibling
+      if sibling
+        splitElement.parentNode.insertBefore(cloneElement, sibling)
+      else
+        splitElement.parentNode.appendChild(cloneElement)
+
+  # This function checks the very start and end element of selection range.
+  # If the element is partial selected, like "<b>aa|bb</b>", and the tag is
+  # also the one to unwrap, the element will be split into half, like
+  # "<b>aa</b><b>|bb</b>", so we can only unwrap the needed one.
+  #
+  # Note that this function will do the spliting recursively, so if we are
+  # unwrapping <b>, and we have "<b>a<i>bb|cc|bb</i>a</b>", the result will
+  # be "<b>a<i>bb</i></b><i>|cc|</i><b><i>bb</i>a</b>"
+  #
+  # However, if we do not find any tag to unwrap all the way up to the root,
+  # the element will not be split even if it is only partial selected.
+  splitBoundaries: (tagName) ->
+    selection = rangy.getSelection()
+    if selection.rangeCount
+      range = selection.getRangeAt(0)
+      if range.startContainer and @findBoundary(tagName, range.startContainer) and range.startOffset > 0
+        @splitBoundary(range.startContainer, range.startOffset, true)
+        range.refresh()
+      if range.endContainer and @findBoundary(tagName, range.endContainer) and range.endOffset < range.endContainer.length
+        @splitBoundary(range.endContainer, range.endOffset, false)
+        range.refresh()
+      @detach(range)
+    @detach(selection)
+
   # Unwrap the closes `tagName` in current selection
   unwrap: (tagName) ->
+    @splitBoundaries(tagName)
     savedSelection = @saveSelection()
     for node in @findTags(tagName, @getSelectedNodes())
       while (childNode = node.firstChild)
