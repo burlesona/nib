@@ -201,31 +201,71 @@ class Nib.Editor extends Nib.Events
       testNode = testNode.parentNode
     false
 
-  # Given a node/element and an offset, this function splits the node/element
-  # into 2 nodes/elements, notice the original node/element is kept, only
-  # one new node/element is created
+  # Given a text node and an offset, this function splits the parent element
+  # into 2 elements, notice the original element is kept, only
+  # one new element is created
   #
-  # A separate argument determines whether the new node/element is inserted
+  # A separate argument determines whether the new element is inserted
   # to the start or the end
-  splitBoundary: (splitNode, offset, isStart) ->
-    if splitNode.nodeType != 1
-      splitElement = splitNode.parentNode
-    else
-      splitElement = splitNode
-      splitNode = splitNode.firstChild
-    cloneElement = splitElement.cloneNode(true)
+  splitNodeBoundary: (splitNode, offset, isStart) ->
+    splitElement = splitNode.parentNode
+    clonedElement = splitElement.cloneNode(true)
+    clonedNode = clonedElement.firstChild
+    parentElement = splitElement.parentNode
     if isStart
-      cloneElement.firstChild.deleteData(offset, -1)
+      clonedNode.deleteData(offset, -1)
       splitNode.deleteData(0, offset)
-      splitElement.parentNode.insertBefore(cloneElement, splitElement)
+      parentElement.insertBefore(clonedElement, splitElement)
     else
-      cloneElement.firstChild.deleteData(0, offset)
+      clonedNode.deleteData(0, offset)
       splitNode.deleteData(offset, -1)
       sibling = splitElement.nextSibling
       if sibling
-        splitElement.parentNode.insertBefore(cloneElement, sibling)
+        parentElement.insertBefore(clonedElement, sibling)
       else
-        splitElement.parentNode.appendChild(cloneElement)
+        parentElement.appendChild(clonedElement)
+    [parentElement, _.indexOf(parentElement.childNodes, splitElement)]
+
+  # Given an HTML element(<b> for example) and an offset, split this
+  # element into 2 elements, each containing part of the child nodes.
+  #
+  # Notice the item at offset index always belongs to the original
+  # element, no matter the new element is added at front(isStart is true),
+  # or at the end(isStart is false)
+  splitElementBoundry: (splitElement, offset, isStart) ->
+    clonedElement = splitElement.cloneNode(false)
+    parentElement = splitElement.parentNode
+    nodes = splitElement.childNodes
+    if isStart
+      clonedElement.appendChild(nodes[0]) for [1..offset] if offset
+      parentElement.insertBefore(clonedElement, splitElement)
+    else
+      t = nodes.length - offset - 1
+      clonedElement.appendChild(nodes[offset + 1]) for [1..t] if t
+      sibling = splitElement.nextSibling
+      if sibling
+        parentElement.insertBefore(clonedElement, sibling)
+      else
+        parentElement.appendChild(clonedElement)
+    [parentElement, _.indexOf(parentElement.childNodes, splitElement)]
+
+  # This function starts from splitNode, it recursively splits node/element
+  # into 2 nodes/elements, until one of the following 2 conditions happens:
+  # 1. We've reached the root node
+  # 2. We've just splitted an element with given tag name
+  #
+  # Notive when condition #2 is met, the element with specified node is
+  # splitted, then the function will exit.
+  splitBoundaryRecursive: (tagName, splitNode, offset, isStart) ->
+    tagName = tagName.toUpperCase()
+    loop
+      return if splitNode == @node
+      quitAfterSplit = (splitNode.nodeType == 1 and splitNode.tagName == tagName)
+      if splitNode.nodeType == 1
+        [splitNode, offset] = @splitElementBoundry(splitNode, offset, isStart)
+      else
+        [splitNode, offset] = @splitNodeBoundary(splitNode, offset, isStart)
+      return if quitAfterSplit
 
   # This function checks the very start and end element of selection range.
   # If the element is partial selected, like "<b>aa|bb</b>", and the tag is
@@ -243,10 +283,10 @@ class Nib.Editor extends Nib.Events
     if selection.rangeCount
       range = selection.getRangeAt(0)
       if range.startContainer and @findBoundary(tagName, range.startContainer) and range.startOffset > 0
-        @splitBoundary(range.startContainer, range.startOffset, true)
+        @splitBoundaryRecursive(tagName, range.startContainer, range.startOffset, true)
         range.refresh()
       if range.endContainer and @findBoundary(tagName, range.endContainer) and range.endOffset < range.endContainer.length
-        @splitBoundary(range.endContainer, range.endOffset, false)
+        @splitBoundaryRecursive(tagName, range.endContainer, range.endOffset, false)
         range.refresh()
       @detach(range)
     @detach(selection)

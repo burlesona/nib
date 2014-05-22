@@ -23,6 +23,13 @@ Nib.Utils =
     if arr.length is 0 then return []
     arr.reduce (lhs, rhs) -> lhs.concat rhs
 
+  indexOf: (col, item) ->
+    i = 0
+    while (i < col.length)
+      return i if col[i] == item
+      i += 1
+    -1
+
   uniqueNodes: (arr) ->
     nodes = []
     for node in arr
