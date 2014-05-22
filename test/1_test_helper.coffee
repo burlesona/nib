@@ -78,26 +78,10 @@ root.testNodeWithSelection = (html, backwards, callback) ->
 
 root.markSelection = () ->
   selection = getSelection()
-  start = selection.baseOffset
-  startText = selection.baseNode.nodeValue
-
-  startText = endText = \
-    startText.slice(0, start) + "|" +
-    startText.slice(start)
-
-  if selection.baseNode is selection.extentNode
-    end = selection.extentOffset + 1
-  else
-    selection.baseNode.nodeValue = startText
-    end = selection.extentOffset
-    endText = selection.extentNode.nodeValue
-
-  endText = endText.slice(0, end) + "|" +
-            endText.slice(end)
-
-  selection.extentNode.nodeValue = endText
-  selection.removeAllRanges()
-
+  if selection.rangeCount
+    range = selection.getRangeAt(0)
+    range.startContainer.insertData(range.startOffset, '|')
+    range.endContainer.insertData(range.endOffset, '|')
 
 # Test Helper Tests
 assert = chai.assert
