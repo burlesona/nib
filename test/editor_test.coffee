@@ -179,6 +179,15 @@ describe "Nib.Editor", ->
           markSelection()
           assert.equal node.innerHTML, "<b>h</b>|ell|<b>o</b>"
 
+    context "for: <b>aa<i>bb|cc|bb</i>aa</b>", ->
+      it "converts to <b>aa<i>bb</i></b><i>|cc|</i><b><i>bb</i>aa</b>", ->
+        testNodeWithSelection "<b>aa<i>bb|cc|bb</i>aa</b>", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.unwrap 'b'
+          assert.equal node.innerHTML, "<b>aa<i>bb</i></b><i>cc</i><b><i>bb</i>aa</b>"
+          markSelection()
+          assert.equal node.innerHTML, "<b>aa<i>bb</i></b><i>|cc|</i><b><i>bb</i>aa</b>"
+
     context "when text is selected backwards", ->
       context "for: h<b>|e</b><b>l|</b>lo", ->
         it "converts to 'h|el|lo'", ->
