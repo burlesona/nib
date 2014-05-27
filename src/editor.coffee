@@ -191,8 +191,109 @@ class Nib.Editor extends Nib.Events
   wrapped: (tagName) ->
     @findTag(tagName, @getSelectedNodes())
 
+  # This function starts from a node, it travels all the way up to the root
+  # node. It returns true if we can find an element with specified tag,
+  # otherwise it returns false
+  findBoundary: (tagName, testNode) ->
+    tagName = tagName.toUpperCase()
+    while (testNode != @node)
+      return true if testNode.nodeType == 1 and testNode.tagName = tagName
+      testNode = testNode.parentNode
+    false
+
+  # Given a text node and an offset, this function splits the parent element
+  # into 2 elements, notice the original element is kept, only
+  # one new element is created
+  #
+  # A separate argument determines whether the new element is inserted
+  # to the start or the end
+  splitNodeBoundary: (splitNode, offset, isStart) ->
+    splitElement = splitNode.parentNode
+    clonedElement = splitElement.cloneNode(true)
+    clonedNode = clonedElement.firstChild
+    parentElement = splitElement.parentNode
+    if isStart
+      clonedNode.deleteData(offset, -1)
+      splitNode.deleteData(0, offset)
+      parentElement.insertBefore(clonedElement, splitElement)
+    else
+      clonedNode.deleteData(0, offset)
+      splitNode.deleteData(offset, -1)
+      sibling = splitElement.nextSibling
+      if sibling
+        parentElement.insertBefore(clonedElement, sibling)
+      else
+        parentElement.appendChild(clonedElement)
+    [parentElement, _.indexOf(parentElement.childNodes, splitElement)]
+
+  # Given an HTML element(<b> for example) and an offset, split this
+  # element into 2 elements, each containing part of the child nodes.
+  #
+  # Notice the item at offset index always belongs to the original
+  # element, no matter the new element is added at front(isStart is true),
+  # or at the end(isStart is false)
+  splitElementBoundry: (splitElement, offset, isStart) ->
+    clonedElement = splitElement.cloneNode(false)
+    parentElement = splitElement.parentNode
+    nodes = splitElement.childNodes
+    if isStart
+      clonedElement.appendChild(nodes[0]) for [1..offset] if offset
+      parentElement.insertBefore(clonedElement, splitElement)
+    else
+      t = nodes.length - offset - 1
+      clonedElement.appendChild(nodes[offset + 1]) for [1..t] if t
+      sibling = splitElement.nextSibling
+      if sibling
+        parentElement.insertBefore(clonedElement, sibling)
+      else
+        parentElement.appendChild(clonedElement)
+    [parentElement, _.indexOf(parentElement.childNodes, splitElement)]
+
+  # This function starts from splitNode, it recursively splits node/element
+  # into 2 nodes/elements, until one of the following 2 conditions happens:
+  # 1. We've reached the root node
+  # 2. We've just splitted an element with given tag name
+  #
+  # Notive when condition #2 is met, the element with specified node is
+  # splitted, then the function will exit.
+  splitBoundaryRecursive: (tagName, splitNode, offset, isStart) ->
+    tagName = tagName.toUpperCase()
+    loop
+      return if splitNode == @node
+      quitAfterSplit = (splitNode.nodeType == 1 and splitNode.tagName == tagName)
+      if splitNode.nodeType == 1
+        [splitNode, offset] = @splitElementBoundry(splitNode, offset, isStart)
+      else
+        [splitNode, offset] = @splitNodeBoundary(splitNode, offset, isStart)
+      return if quitAfterSplit
+
+  # This function checks the very start and end element of selection range.
+  # If the element is partial selected, like "<b>aa|bb</b>", and the tag is
+  # also the one to unwrap, the element will be split into half, like
+  # "<b>aa</b><b>|bb</b>", so we can only unwrap the needed one.
+  #
+  # Note that this function will do the spliting recursively, so if we are
+  # unwrapping <b>, and we have "<b>a<i>bb|cc|bb</i>a</b>", the result will
+  # be "<b>a<i>bb</i></b><i>|cc|</i><b><i>bb</i>a</b>"
+  #
+  # However, if we do not find any tag to unwrap all the way up to the root,
+  # the element will not be split even if it is only partial selected.
+  splitBoundaries: (tagName) ->
+    selection = rangy.getSelection()
+    if selection.rangeCount
+      range = selection.getRangeAt(0)
+      if range.startContainer and @findBoundary(tagName, range.startContainer) and range.startOffset > 0
+        @splitBoundaryRecursive(tagName, range.startContainer, range.startOffset, true)
+        range.refresh()
+      if range.endContainer and @findBoundary(tagName, range.endContainer) and range.endOffset < range.endContainer.length
+        @splitBoundaryRecursive(tagName, range.endContainer, range.endOffset, false)
+        range.refresh()
+      @detach(range)
+    @detach(selection)
+
   # Unwrap the closes `tagName` in current selection
   unwrap: (tagName) ->
+    @splitBoundaries(tagName)
     savedSelection = @saveSelection()
     for node in @findTags(tagName, @getSelectedNodes())
       while (childNode = node.firstChild)

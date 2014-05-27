@@ -133,14 +133,14 @@ describe "Nib.Editor", ->
           assert.equal(node.innerHTML, "|hello|")
 
     context "for: |h<b>el|l</b>o", ->
-      it "converts to '|hel|lo'", ->
+      it "converts to '|hel|<b>l</b>o'", ->
         testNodeWithSelection "|h<b>el|l</b>o", false, (node) ->
           ed = new Nib.Editor(node: node)
 
           ed.unwrap("b")
-          assert.equal(node.innerHTML, "hello")
+          assert.equal(node.innerHTML, "hel<b>l</b>o")
           markSelection()
-          assert.equal(node.innerHTML, "|hel|lo")
+          assert.equal(node.innerHTML, "|hel|<b>l</b>o")
 
     context "for: h<b>|e</b><b>l|</b>lo", ->
       it "converts to 'h|el|lo'", ->
@@ -178,6 +178,15 @@ describe "Nib.Editor", ->
           assert.equal node.innerHTML, "<b>h</b>ell<b>o</b>"
           markSelection()
           assert.equal node.innerHTML, "<b>h</b>|ell|<b>o</b>"
+
+    context "for: <b>aa<i>bb|cc|bb</i>aa</b>", ->
+      it "converts to <b>aa<i>bb</i></b><i>|cc|</i><b><i>bb</i>aa</b>", ->
+        testNodeWithSelection "<b>aa<i>bb|cc|bb</i>aa</b>", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.unwrap 'b'
+          assert.equal node.innerHTML, "<b>aa<i>bb</i></b><i>cc</i><b><i>bb</i>aa</b>"
+          markSelection()
+          assert.equal node.innerHTML, "<b>aa<i>bb</i></b><i>|cc|</i><b><i>bb</i>aa</b>"
 
     context "when text is selected backwards", ->
       context "for: h<b>|e</b><b>l|</b>lo", ->
