@@ -91,6 +91,17 @@
         return lhs.concat(rhs);
       });
     },
+    indexOf: function(col, item) {
+      var i;
+      i = 0;
+      while (i < col.length) {
+        if (col[i] === item) {
+          return i;
+        }
+        i += 1;
+      }
+      return -1;
+    },
     uniqueNodes: function(arr) {
       var node, nodes, _i, _j, _len, _len1;
       nodes = [];
@@ -415,8 +426,109 @@
       return this.findTag(tagName, this.getSelectedNodes());
     };
 
+    Editor.prototype.findBoundary = function(tagName, testNode) {
+      tagName = tagName.toUpperCase();
+      while (testNode !== this.node) {
+        if (testNode.nodeType === 1 && (testNode.tagName = tagName)) {
+          return true;
+        }
+        testNode = testNode.parentNode;
+      }
+      return false;
+    };
+
+    Editor.prototype.splitNodeBoundary = function(splitNode, offset, isStart) {
+      var clonedElement, clonedNode, parentElement, sibling, splitElement;
+      splitElement = splitNode.parentNode;
+      clonedElement = splitElement.cloneNode(true);
+      clonedNode = clonedElement.firstChild;
+      parentElement = splitElement.parentNode;
+      if (isStart) {
+        clonedNode.deleteData(offset, -1);
+        splitNode.deleteData(0, offset);
+        parentElement.insertBefore(clonedElement, splitElement);
+      } else {
+        clonedNode.deleteData(0, offset);
+        splitNode.deleteData(offset, -1);
+        sibling = splitElement.nextSibling;
+        if (sibling) {
+          parentElement.insertBefore(clonedElement, sibling);
+        } else {
+          parentElement.appendChild(clonedElement);
+        }
+      }
+      return [parentElement, _.indexOf(parentElement.childNodes, splitElement)];
+    };
+
+    Editor.prototype.splitElementBoundry = function(splitElement, offset, isStart) {
+      var clonedElement, nodes, parentElement, sibling, t, _i, _j;
+      clonedElement = splitElement.cloneNode(false);
+      parentElement = splitElement.parentNode;
+      nodes = splitElement.childNodes;
+      if (isStart) {
+        if (offset) {
+          for (_i = 1; 1 <= offset ? _i <= offset : _i >= offset; 1 <= offset ? _i++ : _i--) {
+            clonedElement.appendChild(nodes[0]);
+          }
+        }
+        parentElement.insertBefore(clonedElement, splitElement);
+      } else {
+        t = nodes.length - offset - 1;
+        if (t) {
+          for (_j = 1; 1 <= t ? _j <= t : _j >= t; 1 <= t ? _j++ : _j--) {
+            clonedElement.appendChild(nodes[offset + 1]);
+          }
+        }
+        sibling = splitElement.nextSibling;
+        if (sibling) {
+          parentElement.insertBefore(clonedElement, sibling);
+        } else {
+          parentElement.appendChild(clonedElement);
+        }
+      }
+      return [parentElement, _.indexOf(parentElement.childNodes, splitElement)];
+    };
+
+    Editor.prototype.splitBoundaryRecursive = function(tagName, splitNode, offset, isStart) {
+      var quitAfterSplit, _ref, _ref1;
+      tagName = tagName.toUpperCase();
+      while (true) {
+        if (splitNode === this.node) {
+          return;
+        }
+        quitAfterSplit = splitNode.nodeType === 1 && splitNode.tagName === tagName;
+        if (splitNode.nodeType === 1) {
+          _ref = this.splitElementBoundry(splitNode, offset, isStart), splitNode = _ref[0], offset = _ref[1];
+        } else {
+          _ref1 = this.splitNodeBoundary(splitNode, offset, isStart), splitNode = _ref1[0], offset = _ref1[1];
+        }
+        if (quitAfterSplit) {
+          return;
+        }
+      }
+    };
+
+    Editor.prototype.splitBoundaries = function(tagName) {
+      var range, selection;
+      selection = rangy.getSelection();
+      if (selection.rangeCount) {
+        range = selection.getRangeAt(0);
+        if (range.startContainer && this.findBoundary(tagName, range.startContainer) && range.startOffset > 0) {
+          this.splitBoundaryRecursive(tagName, range.startContainer, range.startOffset, true);
+          range.refresh();
+        }
+        if (range.endContainer && this.findBoundary(tagName, range.endContainer) && range.endOffset < range.endContainer.length) {
+          this.splitBoundaryRecursive(tagName, range.endContainer, range.endOffset, false);
+          range.refresh();
+        }
+        this.detach(range);
+      }
+      return this.detach(selection);
+    };
+
     Editor.prototype.unwrap = function(tagName) {
       var childNode, node, savedSelection, _i, _len, _ref;
+      this.splitBoundaries(tagName);
       savedSelection = this.saveSelection();
       _ref = this.findTags(tagName, this.getSelectedNodes());
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
