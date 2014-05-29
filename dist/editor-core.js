@@ -151,45 +151,32 @@
 
   Nib.SelectionHandler = (function() {
     function SelectionHandler() {
-      this.selection = rangy.getSelection();
-      this.anchorNode = this.selection.anchorNode;
-      this.anchorOffset = this.selection.anchorOffset;
-      this.focusNode = this.selection.focusNode;
-      this.focusOffset = this.selection.focusOffset;
-      this.backwards = this.selection.isBackwards();
+      var selection;
+      selection = rangy.getSelection();
+      if (selection.rangeCount) {
+        this.range = selection.getRangeAt(0);
+        this.backwards = selection.isBackwards();
+      }
     }
 
     SelectionHandler.prototype.restoreSelection = function() {
-      var endRange, startRange;
-      startRange = rangy.createRange();
-      startRange.setStart(this.anchorNode, this.anchorOffset);
-      if (this.selection.anchorNode === null) {
-        this.selection = rangy.getSelection();
+      var newRange, selection;
+      if (this.range) {
+        newRange = rangy.createRange();
+        newRange.setStart(this.range.startContainer, this.range.startOffset);
+        newRange.setEnd(this.range.endContainer, this.range.endOffset);
+        selection = rangy.getSelection();
+        selection.removeAllRanges();
+        return selection.addRange(newRange, this.backwards);
       }
-      if (this.selection.rangeCount) {
-        this.selection.removeAllRanges();
-      }
-      if (this.backwards) {
-        startRange.setEnd(this.anchorNode, this.anchorOffset);
-        endRange = rangy.createRange();
-        endRange.setStart(this.focusNode, this.focusOffset);
-        endRange.setEnd(this.focusNode, this.focusOffset);
-        this.selection.addRange(startRange);
-        this.selection.addRange(endRange, true);
-        _.rangyDetach(endRange);
-      } else {
-        startRange.setEnd(this.focusNode, this.focusOffset);
-        this.selection.setSingleRange(startRange);
-      }
-      return _.rangyDetach(startRange);
     };
 
     SelectionHandler.prototype.collapseToEnd = function() {
-      return this.selection.collapseToEnd();
+      return rangy.getSelection().collapseToEnd();
     };
 
     SelectionHandler.prototype.collapseToStart = function() {
-      return this.selection.collapseToStart();
+      return rangy.getSelection().collapseToStart();
     };
 
     return SelectionHandler;
@@ -444,12 +431,12 @@
       clonedNode = clonedElement.firstChild;
       parentElement = splitElement.parentNode;
       if (isStart) {
-        clonedNode.deleteData(offset, -1);
+        clonedNode.deleteData(offset, clonedNode.textContent.length);
         splitNode.deleteData(0, offset);
         parentElement.insertBefore(clonedElement, splitElement);
       } else {
         clonedNode.deleteData(0, offset);
-        splitNode.deleteData(offset, -1);
+        splitNode.deleteData(offset, clonedNode.textContent.length);
         sibling = splitElement.nextSibling;
         if (sibling) {
           parentElement.insertBefore(clonedElement, sibling);
