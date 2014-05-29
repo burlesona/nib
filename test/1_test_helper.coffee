@@ -21,8 +21,7 @@ root.makeSelection = (startNode, startOffset, endNode, endOffset) ->
   range.setEnd(endNode, endOffset)
   selection = rangy.getSelection()
   selection.removeAllRanges()
-  selection.addRange(range.nativeRange)
-  range.detach()
+  selection.addRange(range)
 
   selection
 
