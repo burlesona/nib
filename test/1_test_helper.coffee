@@ -10,10 +10,17 @@ root.makeNode = (type,html,append=true) ->
   document.body.appendChild(el) if append
   el
 
+
+root.removeNode = (node) ->
+  if node.remove?
+    node.remove()
+  else if node.removeNode?
+    node.removeNode()
+
 root.testNode = (type,html,callback) ->
   node = makeNode type, html
   callback(node)
-  node.remove()
+  removeNode(node)
 
 root.makeSelection = (startNode, startOffset, endNode, endOffset) ->
   range = rangy.createRange()
@@ -67,7 +74,7 @@ root.testNodeWithSelection = (html, backwards, callback) ->
 
   callback(node)
 
-  node.remove()
+  removeNode(node)
 
 root.markSelection = () ->
   selection = getSelection()
@@ -88,7 +95,7 @@ describe "Test Helpers", ->
       assert.equal p.nodeName, 'P'
       assert.equal p.textContent, 'Hello World!'
       assert document.body.lastChild == p
-      p.remove()
+      removeNode(p)
 
   describe "testNode", ->
     it "should provide a temp node in a callback", ->

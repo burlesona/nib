@@ -13,7 +13,7 @@ describe "Nib.SelectionHandler", ->
             # move the element outside its container
             root.insertBefore(node.firstChild, node)
             # remove old container
-            node.remove()
+            removeNode(node)
 
             # restore selection
             selection.restoreSelection()
