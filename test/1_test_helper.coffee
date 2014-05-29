@@ -1,6 +1,8 @@
 # Global Scope
 root = exports ? this
 
+_ = Nib.Utils
+
 # Nib Test Helpers
 root.makeNode = (type,html,append=true) ->
   el = document.createElement(type)
@@ -85,7 +87,7 @@ describe "Test Helpers", ->
     it "should create an element and append it to the dom", ->
       p = makeNode 'p','Hello World!'
       assert.equal p.nodeName, 'P'
-      assert.equal p.innerText, 'Hello World!'
+      assert.equal p.textContent, 'Hello World!'
       assert document.body.lastChild == p
       p.remove()
 
@@ -94,8 +96,8 @@ describe "Test Helpers", ->
       testP = null
       testNode 'p', 'This is a test', (p) ->
         testP = p
-        assert.equal document.body.lastChild, p
-        assert.equal p.innerText, 'This is a test'
+        assert _.indexOf(document.body.childNodes, p)
+        assert.equal p.textContent, 'This is a test'
       assert document.body.lastChild != testP
 
   describe "makeSelection", ->
