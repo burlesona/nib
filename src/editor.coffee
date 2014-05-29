@@ -213,12 +213,12 @@ class Nib.Editor extends Nib.Events
     clonedNode = clonedElement.firstChild
     parentElement = splitElement.parentNode
     if isStart
-      clonedNode.deleteData(offset, -1)
+      clonedNode.deleteData(offset, clonedNode.textContent.length)
       splitNode.deleteData(0, offset)
       parentElement.insertBefore(clonedElement, splitElement)
     else
       clonedNode.deleteData(0, offset)
-      splitNode.deleteData(offset, -1)
+      splitNode.deleteData(offset, clonedNode.textContent.length)
       sibling = splitElement.nextSibling
       if sibling
         parentElement.insertBefore(clonedElement, sibling)

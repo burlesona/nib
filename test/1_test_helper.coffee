@@ -1,6 +1,8 @@
 # Global Scope
 root = exports ? this
 
+_ = Nib.Utils
+
 # Nib Test Helpers
 root.makeNode = (type,html,append=true) ->
   el = document.createElement(type)
@@ -17,29 +19,20 @@ root.makeSelection = (startNode, startOffset, endNode, endOffset) ->
   range = rangy.createRange()
   range.setStart(startNode, startOffset)
   range.setEnd(endNode, endOffset)
-  selection = window.getSelection()
+  selection = rangy.getSelection()
   selection.removeAllRanges()
-  selection.addRange(range.nativeRange)
-  range.detach()
+  selection.addRange(range)
 
   selection
 
 root.makeBackwardSelection = (startNode, startOffset, endNode, endOffset) ->
   range = rangy.createRange()
-  endRange = rangy.createRange()
-  selection = rangy.getSelection()
-
   range.setStart(startNode, startOffset)
-  range.setEnd(startNode, startOffset)
-
-  endRange.setStart(endNode, endOffset)
-  endRange.setEnd(endNode, endOffset)
-
-  selection.addRange(range)
-  selection.addRange(endRange, true)
-
+  range.setEnd(endNode, endOffset)
+  selection = rangy.getSelection()
+  selection.removeAllRanges()
+  selection.addRange(range.nativeRange, true)
   range.detach()
-  endRange.detach()
 
   selection
 
@@ -66,8 +59,8 @@ root.testNodeWithSelection = (html, backwards, callback) ->
   selection = getSelectionParams(node)
 
   if backwards
-    makeBackwardSelection(selection[1].node, selection[1].index,
-                          selection[0].node, selection[0].index)
+    makeBackwardSelection(selection[0].node, selection[0].index,
+                          selection[1].node, selection[1].index)
   else
     makeSelection(selection[0].node, selection[0].index,
                   selection[1].node, selection[1].index)
@@ -83,6 +76,9 @@ root.markSelection = () ->
     range.startContainer.insertData(range.startOffset, '|')
     range.endContainer.insertData(range.endOffset, '|')
 
+before ->
+  rangy.init()
+
 # Test Helper Tests
 assert = chai.assert
 describe "Test Helpers", ->
@@ -90,7 +86,7 @@ describe "Test Helpers", ->
     it "should create an element and append it to the dom", ->
       p = makeNode 'p','Hello World!'
       assert.equal p.nodeName, 'P'
-      assert.equal p.innerText, 'Hello World!'
+      assert.equal p.textContent, 'Hello World!'
       assert document.body.lastChild == p
       p.remove()
 
@@ -99,8 +95,8 @@ describe "Test Helpers", ->
       testP = null
       testNode 'p', 'This is a test', (p) ->
         testP = p
-        assert.equal document.body.lastChild, p
-        assert.equal p.innerText, 'This is a test'
+        assert _.indexOf(document.body.childNodes, p)
+        assert.equal p.textContent, 'This is a test'
       assert document.body.lastChild != testP
 
   describe "makeSelection", ->
