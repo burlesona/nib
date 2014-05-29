@@ -83,6 +83,9 @@ root.markSelection = () ->
     range.startContainer.insertData(range.startOffset, '|')
     range.endContainer.insertData(range.endOffset, '|')
 
+before ->
+  rangy.init()
+
 # Test Helper Tests
 assert = chai.assert
 describe "Test Helpers", ->
