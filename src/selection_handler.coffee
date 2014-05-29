@@ -5,45 +5,28 @@ _ = Nib.Utils
 # selected nodes
 class Nib.SelectionHandler
   constructor: () ->
-    @selection = rangy.getSelection()
+    selection = rangy.getSelection()
 
-    @anchorNode = @selection.anchorNode
-    @anchorOffset = @selection.anchorOffset
-    @focusNode = @selection.focusNode
-    @focusOffset = @selection.focusOffset
-
-    @backwards = @selection.isBackwards()
+    if selection.rangeCount
+      @range = selection.getRangeAt(0)
+      @backwards = selection.isBackwards()
 
   restoreSelection: () ->
-    startRange = rangy.createRange()
+    if @range
+      newRange = rangy.createRange()
+      newRange.setStart(@range.startContainer, @range.startOffset)
+      newRange.setEnd(@range.endContainer, @range.endOffset)
 
-    startRange.setStart(@anchorNode, @anchorOffset)
-    @selection = rangy.getSelection() if @selection.anchorNode is null
-    @selection.removeAllRanges() if @selection.rangeCount
-
-    if @backwards
-      startRange.setEnd(@anchorNode, @anchorOffset)
-
-      endRange = rangy.createRange()
-      endRange.setStart(@focusNode, @focusOffset)
-      endRange.setEnd(@focusNode, @focusOffset)
-
-      @selection.addRange(startRange)
-      @selection.addRange(endRange, true)
-
-      _.rangyDetach(endRange)
-    else
-      startRange.setEnd(@focusNode, @focusOffset)
-      @selection.setSingleRange(startRange)
-
-    _.rangyDetach(startRange)
+      selection = rangy.getSelection()
+      selection.removeAllRanges()
+      selection.addRange(newRange, @backwards)
 
   # Collapse the current selection to the end
   # ie: `|hello|` becomes `hello||`
   collapseToEnd: ->
-    @selection.collapseToEnd()
+    rangy.getSelection().collapseToEnd()
 
   # Collapse the current selection to the beginning
   # ie: `|hello|` becomes `||hello`
   collapseToStart: ->
-    @selection.collapseToStart()
+    rangy.getSelection().collapseToStart()

@@ -17,7 +17,7 @@ root.makeSelection = (startNode, startOffset, endNode, endOffset) ->
   range = rangy.createRange()
   range.setStart(startNode, startOffset)
   range.setEnd(endNode, endOffset)
-  selection = window.getSelection()
+  selection = rangy.getSelection()
   selection.removeAllRanges()
   selection.addRange(range.nativeRange)
   range.detach()
@@ -26,20 +26,12 @@ root.makeSelection = (startNode, startOffset, endNode, endOffset) ->
 
 root.makeBackwardSelection = (startNode, startOffset, endNode, endOffset) ->
   range = rangy.createRange()
-  endRange = rangy.createRange()
-  selection = rangy.getSelection()
-
   range.setStart(startNode, startOffset)
-  range.setEnd(startNode, startOffset)
-
-  endRange.setStart(endNode, endOffset)
-  endRange.setEnd(endNode, endOffset)
-
-  selection.addRange(range)
-  selection.addRange(endRange, true)
-
+  range.setEnd(endNode, endOffset)
+  selection = rangy.getSelection()
+  selection.removeAllRanges()
+  selection.addRange(range.nativeRange, true)
   range.detach()
-  endRange.detach()
 
   selection
 
@@ -66,8 +58,8 @@ root.testNodeWithSelection = (html, backwards, callback) ->
   selection = getSelectionParams(node)
 
   if backwards
-    makeBackwardSelection(selection[1].node, selection[1].index,
-                          selection[0].node, selection[0].index)
+    makeBackwardSelection(selection[0].node, selection[0].index,
+                          selection[1].node, selection[1].index)
   else
     makeSelection(selection[0].node, selection[0].index,
                   selection[1].node, selection[1].index)
