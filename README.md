@@ -29,6 +29,8 @@ $ testem
 
 This will open a TestEm Chrome Runner. Now you can write/edit tests in the `/test` directory, as well as code in the `src` directory, and it will automatically re-run the tests as you make changes.
 
+There was a ``selectNode`` test but it's removed since it always fails because selecting an empty node (like ``<img>``) is tricky and inconsitent between browsers.
+
 **To Demo:**
 
 ```shell

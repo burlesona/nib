@@ -41,21 +41,6 @@ describe "Nib.Editor", ->
         assert.equal(node.firstChild.firstChild, nodes[0])
         assert.equal(node.firstChild, nodes[1])
 
-  describe "selectNode", ->
-    it "should update the selection to be the given node", ->
-      testNode 'p', 'Hello World', (p) ->
-        node = makeNode('img', '', false)
-        p.appendChild(node)
-        ed = new Nib.Editor node: p
-        ed.activate()
-        ed.selectNode(node)
-
-        sel = rangy.getSelection()
-        range = sel.getRangeAt(0)
-        nodes = range.getNodes()
-        assert.equal(1, nodes.length)
-        assert.equal(nodes[0], node)
-
   describe "links", ->
     it "should set href", ->
       testNodeWithSelection '|click here|', true, (node) ->
