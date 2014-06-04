@@ -500,13 +500,15 @@
       selection = rangy.getSelection();
       if (selection.rangeCount) {
         range = selection.getRangeAt(0);
-        if (range.startContainer && this.findBoundary(tagName, range.startContainer) && range.startOffset > 0) {
-          this.splitBoundaryRecursive(tagName, range.startContainer, range.startOffset, true);
-          range.refresh();
-        }
-        if (range.endContainer && this.findBoundary(tagName, range.endContainer) && range.endOffset < range.endContainer.length) {
-          this.splitBoundaryRecursive(tagName, range.endContainer, range.endOffset, false);
-          range.refresh();
+        if (!range.collapsed) {
+          if (range.startContainer && this.findBoundary(tagName, range.startContainer) && range.startOffset > 0) {
+            this.splitBoundaryRecursive(tagName, range.startContainer, range.startOffset, true);
+            range.refresh();
+          }
+          if (range.endContainer && this.findBoundary(tagName, range.endContainer) && range.endOffset < range.endContainer.length) {
+            this.splitBoundaryRecursive(tagName, range.endContainer, range.endOffset, false);
+            range.refresh();
+          }
         }
         this.detach(range);
       }

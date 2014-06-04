@@ -282,12 +282,13 @@ class Nib.Editor extends Nib.Events
     selection = rangy.getSelection()
     if selection.rangeCount
       range = selection.getRangeAt(0)
-      if range.startContainer and @findBoundary(tagName, range.startContainer) and range.startOffset > 0
-        @splitBoundaryRecursive(tagName, range.startContainer, range.startOffset, true)
-        range.refresh()
-      if range.endContainer and @findBoundary(tagName, range.endContainer) and range.endOffset < range.endContainer.length
-        @splitBoundaryRecursive(tagName, range.endContainer, range.endOffset, false)
-        range.refresh()
+      unless range.collapsed
+        if range.startContainer and @findBoundary(tagName, range.startContainer) and range.startOffset > 0
+          @splitBoundaryRecursive(tagName, range.startContainer, range.startOffset, true)
+          range.refresh()
+        if range.endContainer and @findBoundary(tagName, range.endContainer) and range.endOffset < range.endContainer.length
+          @splitBoundaryRecursive(tagName, range.endContainer, range.endOffset, false)
+          range.refresh()
       @detach(range)
     @detach(selection)
 
