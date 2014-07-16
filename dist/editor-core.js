@@ -318,7 +318,7 @@
       return this.rangeAfterSelection().toHtml();
     };
 
-    Editor.prototype.isCaratAtNodeStart = function() {
+    Editor.prototype.isCaretAtNodeStart = function() {
       var _ref;
       return ((_ref = this.rangeBeforeSelection()) != null ? _ref.toString() : void 0) === "";
     };

@@ -123,7 +123,7 @@ class Nib.Editor extends Nib.Events
   contentAfterSelection: ->
     @rangeAfterSelection().toHtml()
 
-  isCaratAtNodeStart: ->
+  isCaretAtNodeStart: ->
     @rangeBeforeSelection()?.toString() is ""
 
   # Use rangy to get the current selection
