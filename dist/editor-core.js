@@ -277,6 +277,36 @@
       return this.checkSelection();
     };
 
+    Editor.prototype.getContent = function() {
+      return this.node.innerHTML;
+    };
+
+    Editor.prototype.contentBeforeSelection = function() {
+      var b, s;
+      s = this.getSelection();
+      b = rangy.createRange();
+      b.setStart(this.node, 0);
+      b.setEnd(s.anchorNode, s.anchorOffset);
+      return b.toHtml();
+    };
+
+    Editor.prototype.contentInSelection = function() {
+      var r, s;
+      s = this.getSelection();
+      r = s.getRangeAt(0);
+      return r.toHtml();
+    };
+
+    Editor.prototype.contentAfterSelection = function() {
+      var a, r, s;
+      s = this.getSelection();
+      r = s.getRangeAt(0);
+      a = rangy.createRange();
+      a.setStart(r.endContainer, r.endOffset);
+      a.setEnd(this.node, this.node.childNodes.length);
+      return a.toHtml();
+    };
+
     Editor.prototype.getSelection = function() {
       return rangy.getSelection();
     };

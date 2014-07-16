@@ -184,8 +184,6 @@ describe "Nib.Editor", ->
             markSelection()
             assert.equal(node.innerHTML, 'h|el|lo')
 
-
-
   describe "events", ->
     it "should pass editor as first parameter to event handlers", ->
       testNode 'p', 'Here is some sample text', (p) ->
@@ -193,3 +191,68 @@ describe "Nib.Editor", ->
         ed.on 'editor:on', (editor) ->
           assert.equal editor, ed
         ed.activate()
+
+  describe "content introspection", ->
+    it "should return the node content", ->
+      testNodeWithSelection "Hello |There| World!", false, (node) ->
+        ed = new Nib.Editor node: node
+        ed.activate()
+        assert.equal ed.getContent(),"Hello There World!"
+
+    describe "with flat content", ->
+      it "should get the content before the selection", ->
+        testNodeWithSelection "Hello |There| World!", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.activate()
+          assert.equal ed.contentBeforeSelection(),"Hello "
+
+      it "should get the content in the selection", ->
+        testNodeWithSelection "Hello |There| World!", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.activate()
+          assert.equal ed.contentInSelection(),"There"
+
+      it "should get the content after the selection", ->
+        testNodeWithSelection "Hello |There| World!", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.activate()
+          assert.equal ed.contentAfterSelection()," World!"
+
+    describe "with nested content", ->
+      it "should get the content before the selection", ->
+        testNodeWithSelection "I am a <i>str|ing</i> with <b>lots</b>| of <b><i>information</i></b>.", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.activate()
+          assert.equal ed.contentBeforeSelection(),"I am a <i>str</i>"
+
+      it "should get the content in the selection", ->
+        testNodeWithSelection "I am a <i>str|ing</i> with <b>lots</b>| of <b><i>information</i></b>.", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.activate()
+          assert.equal ed.contentInSelection(),"<i>ing</i> with <b>lots</b>"
+
+      it "should get the content after the selection", ->
+        testNodeWithSelection "I am a <i>str|ing</i> with <b>lots</b>| of <b><i>information</i></b>.", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.activate()
+          assert.equal ed.contentAfterSelection()," of <b><i>information</i></b>."
+
+    describe "with deeply nested content", ->
+      it "should get the content before the selection", ->
+        testNodeWithSelection "<b>Knowl|edge</b> is <b><i>pow|er</i></b>.", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.activate()
+          assert.equal ed.contentBeforeSelection(),"<b>Knowl</b>"
+
+      it "should get the content in the selection", ->
+        testNodeWithSelection "<b>Knowl|edge</b> is <b><i>pow|er</i></b>.", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.activate()
+          assert.equal ed.contentInSelection(),"<b>edge</b> is <b><i>pow</i></b>"
+
+      it "should get the content after the selection", ->
+        testNodeWithSelection "<b>Knowl|edge</b> is <b><i>pow|er</i></b>", false, (node) ->
+          ed = new Nib.Editor node: node
+          ed.activate()
+          assert.equal ed.contentAfterSelection(),"<b><i>er</i></b>"
+

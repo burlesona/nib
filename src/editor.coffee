@@ -91,6 +91,30 @@ class Nib.Editor extends Nib.Events
   onMouseup: (event) ->
     @checkSelection()
 
+  # Content / Selection Introspection
+  getContent: ->
+    @node.innerHTML
+
+  contentBeforeSelection: ->
+    s = @getSelection()
+    b = rangy.createRange()
+    b.setStart(@node,0)
+    b.setEnd(s.anchorNode,s.anchorOffset)
+    b.toHtml()
+
+  contentInSelection: ->
+    s = @getSelection()
+    r = s.getRangeAt(0)
+    r.toHtml()
+
+  contentAfterSelection: ->
+    s = @getSelection()
+    r = s.getRangeAt(0)
+    a = rangy.createRange()
+    a.setStart(r.endContainer,r.endOffset)
+    a.setEnd(@node,@node.childNodes.length)
+    a.toHtml()
+
   # Use rangy to get the current selection
   getSelection: ->
     rangy.getSelection()
