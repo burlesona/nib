@@ -199,6 +199,18 @@ describe "Nib.Editor", ->
         ed.activate()
         assert.equal ed.getContent(),"Hello There World!"
 
+    it "should check if the carat is at the beginning of the node", ->
+      testNodeWithSelection "||Hello There World!", false, (node) ->
+        ed = new Nib.Editor node: node
+        ed.activate()
+        assert.equal ed.isCaratAtNodeStart(), true
+
+    it "should check if the carat is at the beginning of the node when nested", ->
+      testNodeWithSelection "<b>||Hello There World!</b>", false, (node) ->
+        ed = new Nib.Editor node: node
+        ed.activate()
+        assert.equal ed.isCaratAtNodeStart(), true
+
     describe "with flat content", ->
       it "should get the content before the selection", ->
         testNodeWithSelection "Hello |There| World!", false, (node) ->

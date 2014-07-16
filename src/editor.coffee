@@ -95,25 +95,36 @@ class Nib.Editor extends Nib.Events
   getContent: ->
     @node.innerHTML
 
-  contentBeforeSelection: ->
+  rangeBeforeSelection: ->
     s = @getSelection()
     b = rangy.createRange()
     b.setStart(@node,0)
     b.setEnd(s.anchorNode,s.anchorOffset)
-    b.toHtml()
+    b
+
+  contentBeforeSelection: ->
+    @rangeBeforeSelection().toHtml()
+
+  rangeInSelection: ->
+    s = @getSelection()
+    s.getRangeAt(0)
 
   contentInSelection: ->
-    s = @getSelection()
-    r = s.getRangeAt(0)
-    r.toHtml()
+    @rangeInSelection().toHtml()
 
-  contentAfterSelection: ->
+  rangeAfterSelection: ->
     s = @getSelection()
     r = s.getRangeAt(0)
     a = rangy.createRange()
     a.setStart(r.endContainer,r.endOffset)
     a.setEnd(@node,@node.childNodes.length)
-    a.toHtml()
+    a
+
+  contentAfterSelection: ->
+    @rangeAfterSelection().toHtml()
+
+  isCaratAtNodeStart: ->
+    @rangeBeforeSelection()?.toString() is ""
 
   # Use rangy to get the current selection
   getSelection: ->

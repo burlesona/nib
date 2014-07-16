@@ -281,30 +281,46 @@
       return this.node.innerHTML;
     };
 
-    Editor.prototype.contentBeforeSelection = function() {
+    Editor.prototype.rangeBeforeSelection = function() {
       var b, s;
       s = this.getSelection();
       b = rangy.createRange();
       b.setStart(this.node, 0);
       b.setEnd(s.anchorNode, s.anchorOffset);
-      return b.toHtml();
+      return b;
+    };
+
+    Editor.prototype.contentBeforeSelection = function() {
+      return this.rangeBeforeSelection().toHtml();
+    };
+
+    Editor.prototype.rangeInSelection = function() {
+      var s;
+      s = this.getSelection();
+      return s.getRangeAt(0);
     };
 
     Editor.prototype.contentInSelection = function() {
-      var r, s;
-      s = this.getSelection();
-      r = s.getRangeAt(0);
-      return r.toHtml();
+      return this.rangeInSelection().toHtml();
     };
 
-    Editor.prototype.contentAfterSelection = function() {
+    Editor.prototype.rangeAfterSelection = function() {
       var a, r, s;
       s = this.getSelection();
       r = s.getRangeAt(0);
       a = rangy.createRange();
       a.setStart(r.endContainer, r.endOffset);
       a.setEnd(this.node, this.node.childNodes.length);
-      return a.toHtml();
+      return a;
+    };
+
+    Editor.prototype.contentAfterSelection = function() {
+      return this.rangeAfterSelection().toHtml();
+    };
+
+    Editor.prototype.isCaratAtNodeStart = function() {
+      var _ref;
+      return ((_ref = this.rangeBeforeSelection()) != null ? _ref.toString() : void 0) === "";
     };
 
     Editor.prototype.getSelection = function() {
