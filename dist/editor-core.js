@@ -323,6 +323,16 @@
       return ((_ref = this.rangeBeforeSelection()) != null ? _ref.toString() : void 0) === "";
     };
 
+    Editor.prototype.moveCaretToNodeEnd = function() {
+      var r, s;
+      r = rangy.createRange();
+      r.selectNodeContents(this.node);
+      r.collapse(false);
+      s = rangy.getSelection();
+      s.removeAllRanges();
+      return s.addRange(r);
+    };
+
     Editor.prototype.getSelection = function() {
       return rangy.getSelection();
     };

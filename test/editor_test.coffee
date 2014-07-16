@@ -203,13 +203,22 @@ describe "Nib.Editor", ->
       testNodeWithSelection "||Hello There World!", false, (node) ->
         ed = new Nib.Editor node: node
         ed.activate()
-        assert.equal ed.isCaratAtNodeStart(), true
+        assert.equal ed.isCaretAtNodeStart(), true
 
     it "should check if the carat is at the beginning of the node when nested", ->
       testNodeWithSelection "<b>||Hello There World!</b>", false, (node) ->
         ed = new Nib.Editor node: node
         ed.activate()
-        assert.equal ed.isCaratAtNodeStart(), true
+        assert.equal ed.isCaretAtNodeStart(), true
+
+    it "should move the carat to the end of the node", ->
+      testNodeWithSelection "Hello |There| World!", false, (node) ->
+        ed = new Nib.Editor node: node
+        ed.activate()
+        ed.moveCaretToNodeEnd()
+        markSelection()
+        assert.equal node.innerHTML, "Hello There World!||"
+
 
     describe "with flat content", ->
       it "should get the content before the selection", ->

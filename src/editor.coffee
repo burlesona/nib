@@ -126,6 +126,14 @@ class Nib.Editor extends Nib.Events
   isCaretAtNodeStart: ->
     @rangeBeforeSelection()?.toString() is ""
 
+  moveCaretToNodeEnd: ->
+    r = rangy.createRange()
+    r.selectNodeContents(@node)
+    r.collapse(false)
+    s = rangy.getSelection()
+    s.removeAllRanges()
+    s.addRange(r)
+
   # Use rangy to get the current selection
   getSelection: ->
     rangy.getSelection()

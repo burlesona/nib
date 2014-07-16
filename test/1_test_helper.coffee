@@ -80,8 +80,11 @@ root.markSelection = () ->
   selection = getSelection()
   if selection.rangeCount
     range = selection.getRangeAt(0)
-    range.startContainer.insertData(range.startOffset, '|')
-    range.endContainer.insertData(range.endOffset, '|')
+    if range.startContainer.insertData
+      range.startContainer.insertData(range.startOffset, '|')
+      range.endContainer.insertData(range.endOffset, '|')
+    else
+      range.insertNode( document.createTextNode("||") )
 
 before ->
   rangy.init()
