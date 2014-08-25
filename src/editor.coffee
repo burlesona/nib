@@ -196,7 +196,7 @@ class Nib.Editor extends Nib.Events
     else
       range = rangy.createRange()
       range.selectNodeContents(node)
-      selection.setSingleRange(range)
+    selection.setSingleRange(range)
     @checkSelection(selection)
 
   # Wrap current selection with a tag of type `tagName`
