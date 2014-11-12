@@ -344,6 +344,6 @@ class Nib.Editor extends Nib.Events
         # Here we must not delete & recreate nodes, we just move them. The
         # selection can't be restored when the nodes gets deleted.
         node.parentNode.insertBefore(childNode, node)
-      node.remove()
+      node.parentNode.removeChild(node)
     @restoreSelection(savedSelection)
     @checkSelection()

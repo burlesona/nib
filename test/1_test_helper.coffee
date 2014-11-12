@@ -16,6 +16,8 @@ root.removeNode = (node) ->
     node.remove()
   else if node.removeNode?
     node.removeNode()
+  else
+    node.parentNode.removeChild(node)
 
 root.testNode = (type,html,callback) ->
   node = makeNode type, html

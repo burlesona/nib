@@ -413,8 +413,8 @@
       } else {
         range = rangy.createRange();
         range.selectNodeContents(node);
-        selection.setSingleRange(range);
       }
+      selection.setSingleRange(range);
       return this.checkSelection(selection);
     };
 
@@ -581,7 +581,7 @@
         while ((childNode = node.firstChild)) {
           node.parentNode.insertBefore(childNode, node);
         }
-        node.remove();
+        node.parentNode.removeChild(node);
       }
       this.restoreSelection(savedSelection);
       return this.checkSelection();
