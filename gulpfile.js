@@ -72,30 +72,32 @@ gulp.task('watch', function(){
 
 
 // Output the editor and plugins non-minified for development
-gulp.task('compile', function() {
+gulp.task('compile', function(cb) {
   gulp.src(path.src.core)
     .pipe(coffee().on('error', gutil.log))
-    .pipe(concat('editor-core.js'))
+    .pipe(concat('nib-core.js'))
     .pipe(gulp.dest(path.dist));
   gulp.src(path.src.plugins)
     .pipe(coffee().on('error', gutil.log))
-    .pipe(concat('editor-plugins.js'))
+    .pipe(concat('nib-plugins.js'))
     .pipe(gulp.dest(path.dist));
+  cb();
 });
 
 
 
 // Minify the editor and plugins for production
-gulp.task('build',['compile'],function () {
+gulp.task('build',['compile'],function (cb) {
   //For the moment using concat is just an easy way to rename
-  gulp.src(path.dist + 'editor-core.js')
-    .pipe(concat('editor-core.min.js'))
+  gulp.src(path.dist + 'nib-core.js')
+    .pipe(concat('nib-core.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest(path.dist));
-  gulp.src(path.dist + 'editor-plugins.js')
-    .pipe(concat('editor-plugins.min.js'))
+  gulp.src(path.dist + 'nib-plugins.js')
+    .pipe(concat('nib-plugins.min.js'))
     .pipe(uglify())
     .pipe(gulp.dest(path.dist));
+  cb();
 });
 
 
