@@ -237,7 +237,7 @@ Nib instances communicate information about the state of the user's text
 selection by firing events. There are three built-in events:
 
 * `editor:on`: fires when the editor has finished activating.
-* `editor:off`: fires when the editor has finishe deactivating.
+* `editor:off`: fires when the editor has finished deactivating.
 * `report`: fires when the user changes the selection or moves the text caret.
 
 These events can be listened to like so:
